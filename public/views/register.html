@@ -1,0 +1,74 @@
+<div class="col-md-6 col-md-offset-3">
+	<h1>{{ tagline }}</h1>
+
+
+	<div ng-controller="tab" ng-cloak>
+	  <md-content>
+	    <md-tabs md-selected="selectedIndex" md-dynamic-height md-border-bottom>
+	      <md-tab label="sign in">
+	        <md-content class="md-padding">
+	          SIGN IN
+	        </md-content>
+	      </md-tab>
+	      <md-tab label="register">
+	        <md-content class="md-padding">
+	        	<form name="regForm" ng-controller="register" ng-submit="register(formData)">
+				    <div class="col-md-6 form-group" ng-class="{ 'has-error' : regForm.fName.$invalid && !regForm.fName.$pristine }">
+				        <input type="text" class="form-control" id="fName" name="fName" placeholder="First Name" ng-model="formData.fName" required>
+			            <span ng-show="regForm.fName.$touched && regForm.fName.$invalid" class="text-danger">First Name is required!</span>
+				    </div>
+				    <div class="col-md-6 form-group" ng-class="{ 'has-error' : regForm.lName.$invalid && !regForm.lName.$pristine }">
+				        <input type="text" class="form-control required" id="lName" name="lName" placeholder="Last Name" ng-model="formData.lName" required>
+				        <span ng-show="regForm.lName.$touched && regForm.lName.$invalid" class="text-danger">Last Name is required!</span>
+				    </div>
+
+				    <!-- EMAIL -->
+				    <div class="col-md-12 form-group">
+				    	<div class="input-group" ng-class="{ 'has-error' : regForm.email.$invalid && !regForm.email.$pristine }">
+			    			<span class="input-group-addon">@</span>
+				        	<input 
+				        		type="email" 
+				        		class="form-control" 
+				        		id="email" 
+				        		name="email" 
+				        		placeholder="Email Address" 
+				        		ng-model="formData.email" 
+				        		required
+				        		check-email>
+				        </div>
+				        <span class="col-md-12 text-danger" ng-if="regForm.$pending.emailExists">checking....</span>
+				        <span class="col-md-12 text-danger" ng-if="regForm.$error.emailExists">Email exists already</span>
+				        <span ng-show="regForm.email.$touched && regForm.email.$invalid && !regForm.$error.emailExists" class="text-danger">Email Address is required!</span>
+				    </div><!-- / EMAIL -->
+				    <div class="col-md-12 form-group">
+				    	<div class="input-group" ng-class="{ 'has-error' : regForm.emailConfirm.$invalid && !regForm.emailConfirm.$pristine }">
+			    			<span class="input-group-addon">@</span>
+				        	<input 
+				        		type="email" 
+				        		match="regForm.email" 
+				        		class="form-control" 
+				        		id="emailConfirm" 
+				        		name="emailConfirm" 
+				        		placeholder="Confirm Email Address" 
+				        		ng-model="formData.emailConfirm" 
+				        		required>
+				        </div>
+				        <span ng-show="regForm.emailConfirm.$touched && regForm.emailConfirm.$invalid && regForm.emailConfirm.$error.mismatch" class="text-danger">Please confirm your email address!</span>
+				    </div>
+				    <div class="col-md-12 form-group" ng-class="{ 'has-error' : regForm.zipcode.$invalid && !regForm.zipcode.$pristine }">
+				        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Zip Code" ng-model="formData.zipcode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/">
+				        <span ng-show="regForm.zipcode.$invalid && !regForm.zipcode.$pristine" class="text-danger">Valide zip code is required!</span>
+				    </div>
+				    <div class="col-md-12">
+				    	<button type="submit" ng-disabled="regForm.$invalid" class="btn btn-primary">Register</button>
+				    </div>
+				</form>
+	        </md-content>
+	      </md-tab>
+	    </md-tabs>
+	  </md-content>
+	</div>
+
+	
+
+</div>

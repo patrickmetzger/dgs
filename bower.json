@@ -1,0 +1,13 @@
+{
+  "name": "dgs-mean",
+  "version": "1.0.0",
+  "dependencies": {
+    "bootstrap": "latest",
+    "font-awesome": "latest",
+    "animate.css": "latest",
+    "angular": "latest",
+    "angular-route": "latest",
+    "angular-material": "^1.0.7",
+    "angular-sanitize": "^1.5.5"
+  }
+}

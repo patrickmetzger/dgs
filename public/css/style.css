@@ -1,0 +1,32 @@
+nav.navbar-blue:after, ul.navbar-nav:after {
+  content: "";
+  display: table;
+  clear: both; }
+
+html, body {
+  width: 100%;
+  height: 100%; }
+
+nav.navbar-blue {
+  /*background-image: linear-gradient(rgb(91, 139, 236), rgb(68, 105, 177));
+	height:110px;*/ }
+  nav.navbar-blue .search {
+    line-height: 103px; }
+    @media (min-width: 768px) {
+      nav.navbar-blue .search input {
+        width: 300px; } }
+
+.navbar-nav > li > a {
+  padding-top: 15px;
+  padding-bottom: 15px; }
+
+ul.navbar-nav {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  width: 100%; }
+
+@media (min-width: 768px) {
+  .nav-top {
+    height: 95px; }
+  ul.navbar-nav {
+    /*margin-top:50px;*/ } }

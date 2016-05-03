@@ -30,8 +30,8 @@
                       domain: cookieDomain,
                       expires: exp
                     });
+                    
                     $rootScope.showMenu = true;
-
                     $rootScope.$broadcast('loginStateChange');
 
                     $location.path('/myaccount');

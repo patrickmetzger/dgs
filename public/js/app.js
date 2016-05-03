@@ -24,9 +24,14 @@ angular.module('dgs', [
 angular.module('dgs').run(function ($rootScope, $location, $route, User) {
   $rootScope.$on('$routeChangeStart',
     function (event, next, current) {
+    	console.log(User.checkLogin());
     	if (next.restricted && !User.checkLogin()){
     		$location.path('/login');
 			$route.reload();
+    	}else{
+    		if (User.checkLogin()){
+    			$rootScope.showMenu = true;
+    		}
     	}
     	
     	/*

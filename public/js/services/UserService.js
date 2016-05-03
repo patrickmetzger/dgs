@@ -22,9 +22,11 @@ angular.module('UserService')
         var logout = function(){
             if ($cookies.getObject("dgsUserAuth")){
                 $cookies.remove("dgsUserAuth");
-                $rootScope.showMenu = false;
             }
+            
+            $rootScope.showMenu = false;
             $rootScope.$broadcast('loginStateChange');
+
             $location.path('/login');
             $route.reload();
         };
@@ -62,6 +64,8 @@ angular.module('UserService')
             checkLogin: function() {
                 if ($cookies.getObject("dgsUserAuth")){
                     loginState = true;
+                }else{
+                    loginState = false;
                 };
                 return loginState;
             },

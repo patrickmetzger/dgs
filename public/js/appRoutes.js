@@ -1,5 +1,5 @@
 // public/js/appRoutes.js
-    angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 
     $routeProvider
 
@@ -15,9 +15,23 @@
             templateUrl: "views/search/search.view.html",
             restricted: false
         })
+        .when('/browse-items', {
+            templateUrl: 'views/browse.view.html',
+            controller: "browse",
+            restricted: false
+        })
+        .when('/login', {
+            templateUrl: 'views/login.html',
+            restricted: false
+        })
         .when('/register', {
-          templateUrl: 'views/register.html',
-          restricted: false
+            templateUrl: 'views/register.html',
+            restricted: false
+        })
+        .when('/myaccount', {
+            templateUrl: 'views/myaccount/index.html',
+            controller: 'account',
+            restricted: true
         })
         .when('/admin', {
             templateUrl: 'views/admin/index.html',

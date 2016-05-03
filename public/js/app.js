@@ -2,6 +2,7 @@
 angular.module('dgs', [
 	'ngRoute', 
 	'appRoutes', 
+	'ngCookies',
 	'ValidationDirectives',
 	'MainCtrl', 
 	'NerdCtrl', 
@@ -12,21 +13,29 @@ angular.module('dgs', [
 	'ngMaterial',
 	'CatService',
 	'SearchService',
+	'Account',
+	'AccountService',
 	'Header',
-	'Search'
+	'Search',
+	'Browse',
+	'Authentication'
 ]);
 
-/*
-angular.module('dgs').run(function ($rootScope, $location, $route, AuthService) {
+angular.module('dgs').run(function ($rootScope, $location, $route, User) {
   $rootScope.$on('$routeChangeStart',
     function (event, next, current) {
-    	AuthService.getUserStatus()
+    	if (next.restricted && !User.checkLogin()){
+    		$location.path('/login');
+			$route.reload();
+    	}
+    	
+    	/*
+    	User.getUserStatus()
 	      .then(function(){
-	        if (next.restricted && !AuthService.isLoggedIn()){
+	        if (next.restricted && !User.checkLogin()){
 	          $location.path('/login');
 	          $route.reload();
 	        }
-	      });
+	    });*/
   });
 });
-*/

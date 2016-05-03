@@ -1,3 +1,39 @@
     <nav class="navbar navbar-blue" ng-controller="header">    
-        
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#dgs-main-nav" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="collapse navbar-collapse" id="gs-main-nav">
+            <div class="nav-top container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/"><img src="/imgs/dgs_logo.png"></a>
+                </div>
+                <div class="navbar-header search">
+                    <form ng-controller="search" name="search" class="navbar-form navbar-left" ng-submit="searching()" role="search">
+                        <div class="form-group">
+                          <input type="text" class="form-control" ng-model="keyword" placeholder="keyword">
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" ng-model="category" ng-options="cat.name as cat.name for cat in activeCatList">
+                                <option value="">-- choose category --</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </form>
+                </div>
+            </div>
+            <div class="nav-bottom container">
+                <!-- LINK TO OUR PAGES. ANGULAR HANDLES THE ROUTING HERE -->
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/nerds">Nerds</a></li>
+                    <li><a href="/register?signin=true">Login</a></li>
+                    <li><a href="/register?register=true">Register</a></li>
+                </ul>
+            </div>
+        </div>
     </nav>

@@ -1,11 +1,14 @@
 // server.js
 
 // modules =================================================
-var express        = require('express');
-var app            = express();
-var bodyParser     = require('body-parser');
-var methodOverride = require('method-override');
-var Mongoose = require('mongoose');
+var express        	= require('express');
+var passport 		= require('passport');
+var bodyParser     	= require('body-parser');
+var methodOverride 	= require('method-override');
+var Mongoose 		= require('mongoose');
+var config 			= require("./config.json");
+var unless 			= require('express-unless');
+var app            	= express();
 
 // configuration ===========================================
     

@@ -1,4 +1,4 @@
-nav.navbar-blue:after, ul.navbar-nav:after {
+.nav-bottom:after, nav.navbar-blue:after, ul.navbar-nav:after {
   content: "";
   display: table;
   clear: both; }
@@ -16,17 +16,24 @@ nav.navbar-blue {
       nav.navbar-blue .search input {
         width: 300px; } }
 
-.navbar-nav > li > a {
-  padding-top: 15px;
-  padding-bottom: 15px; }
-
 ul.navbar-nav {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
   width: 100%; }
+
+#main {
+  margin-top: 25px; }
 
 @media (min-width: 768px) {
   .nav-top {
     height: 95px; }
-  ul.navbar-nav {
-    /*margin-top:50px;*/ } }
+  .nav-bottom {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc; }
+    .nav-bottom ul {
+      margin-top: 0;
+      margin-bottom: 0; }
+      .nav-bottom ul li {
+        float: left;
+        list-style: none; }
+        .nav-bottom ul li a {
+          display: block;
+          padding: 10px; } }

@@ -13,9 +13,8 @@
 		if ($routeParams.register){
 			$scope.selectedIndex = 1;
 		};
-		console.log($scope.selectedIndex);
 		
-		return '';
+		return $scope.selectedIndex;
 	};
 
     angular
@@ -37,6 +36,7 @@
 	    	postData.url = '';
 	    	postData.imgThumb = '';
 	    	postData.imgFull = '';
+	    	postData.password = formData.password;
 	    	
 	    	User.create(postData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.

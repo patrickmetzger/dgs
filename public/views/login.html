@@ -1,0 +1,19 @@
+<div class="col-md-6 col-md-offset-3">
+	<h1>Login</h1>
+
+	<form name="signIn" ng-controller="login" ng-submit="login(loginData)">
+		<div class="col-md-6 form-group" ng-class="{ 'has-error' : loginData.email.$invalid && !loginData.email.$pristine }">
+	        <input type="text" class="form-control" id="email" name="email" placeholder="Email Address" ng-model="loginData.email" required>
+            <span ng-show="loginData.fName.$touched && loginData.fName.$invalid" class="text-danger">Username is required!</span>
+	    </div>
+
+	    <div class="col-md-6 form-group" ng-class="{ 'has-error' : loginData.password.$invalid && !loginData.password.$pristine }">
+	        <input type="password" class="form-control" id="password" name="password" placeholder="Username" ng-model="loginData.password" required>
+            <span ng-show="loginData.password.$touched && loginData.password.$invalid" class="text-danger">Password is required!</span>
+	    </div>
+	    <div class="col-md-12">
+	    	<button type="submit" ng-disabled="loginData.$invalid" class="btn btn-primary">Sign In</button>
+	    </div>
+	</form>
+
+</div>

@@ -15,8 +15,7 @@
 	        },
 
 	        getData : function(category, keyword) {
-	        	console.log(category);
-	        	console.log(keyword);
+
 	        }
 		}
 		
@@ -29,7 +28,7 @@
 
 	function catList($http, category) {
 		return {
-			getDropDownList : function() {    			
+			getActiveList : function() {    			
 	    		return category.get().then(function(cat){
 	    			var activeCats = [];
 					for (var i = 0; i < cat.data.length; i++){

@@ -12,6 +12,9 @@ html, body {
 	height: 100%;
 }
 
+.nav-bottom {
+	@extend %clearfix;
+}
 
 nav.navbar-blue {
 	/*background-image: linear-gradient(rgb(91, 139, 236), rgb(68, 105, 177));
@@ -28,15 +31,21 @@ nav.navbar-blue {
 		}
 	}
 }
+
 .navbar-nav>li>a {
-	padding-top: 15px;
-	padding-bottom: 15px;
+	//padding-top: 15px;
+	//padding-bottom: 15px;
 }
 ul.navbar-nav {
-	border-top:1px solid #ccc;
-	border-bottom:1px solid #ccc;
+	//border-top:1px solid #ccc;
+	//border-bottom:1px solid #ccc;
 	width:100%;
+
 	@extend %clearfix;
+}
+
+#main {
+	margin-top:25px;
 }
 
 
@@ -46,12 +55,22 @@ ul.navbar-nav {
 	}
 
 	.nav-bottom {
+		border-top: 1px solid #ccc;
+		border-bottom: 1px solid #ccc;
 
+		ul {
+			margin-top:0;
+			margin-bottom:0;
+
+			li {
+				float:left;
+				list-style:none;
+
+				a {
+					display:block;
+					padding:10px;
+				}
+			}
+		}
 	}
-
-	ul.navbar-nav{
-		/*margin-top:50px;*/
-	}
-
-
 }

@@ -25,6 +25,7 @@ var CATS        = require('./models/cats');
                         if (err) throw err;
                         res.json({
                           success: true,
+                          _id: user._id,
                           message: 'Authenciation Successful',
                           date: Date.now()
                         });
@@ -34,8 +35,8 @@ var CATS        = require('./models/cats');
             });
         });
 
-        // STARTING USERS
-        app.get('/api/users', function(req, res) {
+        // STARTING USER
+        app.get('/api/user', function(req, res) {
             // use mongoose to get all nerds in the database
             User.find(function(err, users) {
 
@@ -48,7 +49,15 @@ var CATS        = require('./models/cats');
             });
         });
 
-        app.get('/api/users/:email', function(req, res, next) {
+        app.get('/api/user/:id', function(req, res, next) {
+            // use mongoose to get user if one exists
+            User.findOne({ _id: req.params.id }, function(err, data) {
+                if (err) return console.error(err);
+                    res.json(data)
+            });
+        });
+
+        app.get('/api/user/:email', function(req, res, next) {
             // use mongoose to get user if one exists
             User.findOne({ email: req.params.email }, function(err, data) {
                 if (err) return console.error(err);
@@ -56,7 +65,7 @@ var CATS        = require('./models/cats');
             });
         });
 
-        app.post('/api/users', function(req, res) {
+        app.post('/api/user', function(req, res) {
             var regPost;
             regPost = new User({
                 fName : req.body.fName,

@@ -19,6 +19,13 @@ angular.module('UserService')
             }
         };
 
+        var activeUserProfile = function(){
+            if (checkBearerToken()){
+                var activeSession = $cookies.getObject("dgsUserAuth");
+                return $http.get('/api/user/' + activeSession.token);
+            }
+        }
+
         var logout = function(){
             if ($cookies.getObject("dgsUserAuth")){
                 $cookies.remove("dgsUserAuth");
@@ -39,7 +46,7 @@ angular.module('UserService')
 
             // call to get all nerds
             get : function() {
-                return $http.get('/api/users');
+                return $http.get('/api/user');
             },
 
             checkEmail : function(email) {
@@ -49,12 +56,12 @@ angular.module('UserService')
             // these will work when more API routes are defined on the Node side of things
             // call to POST and create a new nerd
             create : function(usersData) {
-                return $http.post('/api/users', usersData);
+                return $http.post('/api/user', usersData);
             },
 
             // call to DELETE a nerd
             delete : function(id) {
-                return $http.delete('/api/users/' + id);
+                return $http.delete('/api/user/' + id);
             },
 
             authenticate : function(loginData){
@@ -74,16 +81,11 @@ angular.module('UserService')
                 return function() {
                     logout($scope);
                 };
-            }
-
-            /*
-            noAccess: function(){
-                return logout();
             },
 
-            doLogout: function($scope){
-                return logout();
-            }*/
+            getProfile: function(){
+                return activeUserProfile();
+            }
         }       
 
     };

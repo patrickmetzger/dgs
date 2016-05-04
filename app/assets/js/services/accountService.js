@@ -9,9 +9,14 @@
         .factory('accountInfo', accountInfo);
 
 	function accountInfo($http, $location, User) {
-		checkSecurity($location, user);
+		//checkSecurity($location, user);
 
-		return '';
+		return {
+			userProfile: function(){
+				
+			}
+
+		};
 		
 	}
 

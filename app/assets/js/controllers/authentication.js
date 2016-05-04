@@ -4,10 +4,12 @@
 
     angular.module('Authentication', ['UserService']);
 
-    var checkSecurity = function($location, User){
+    angular.module('Authentication').controller('checkSecurity', checkSecurity);
+    function checkSecurity($scope, $location, User){
+        
         if (!User.checkAccessToken()){
-            User.noAccess();    
-        }
+            user.noAccess();    
+         }
     };
 
     angular.module('Authentication').controller('login', login);
@@ -20,12 +22,11 @@
                     // save the user cookie
                     var sessionCookie = {};
 
-                    sessionCookie.token = 1;
+                    sessionCookie.token = response.data._id;
 
                     var cookieDomain = "localhost";
                     var newDate = new Date();
                     var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
-                    
                     $cookies.putObject('dgsUserAuth', sessionCookie, {
                       domain: cookieDomain,
                       expires: exp

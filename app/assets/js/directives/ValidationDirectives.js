@@ -32,7 +32,7 @@
           model.$asyncValidators.emailExists = function() {
             // check email to make sure it doesn't exist all ready
             var email = model.$viewValue;
-            return $http.get('/api/users/' + email).then(function(res){
+            return $http.get('/api/user/' + email).then(function(res){
               $timeout(function(){
                 model.$setValidity('emailExists', !res.data); 
               });

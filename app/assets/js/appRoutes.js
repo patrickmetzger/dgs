@@ -20,6 +20,16 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
             controller: "browse",
             restricted: false
         })
+        .when('/browse-items/:catType', {
+            templateUrl: 'views/browse.items.html',
+            controller: "browseItems",
+            restricted: false
+        })
+        .when('/item/:item/:itemID', {
+            templateUrl: 'views/item.view.html',
+            controller: "item",
+            restricted: false
+        })
         .when('/login', {
             templateUrl: 'views/login.html',
             restricted: false

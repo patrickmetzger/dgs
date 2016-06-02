@@ -14,8 +14,8 @@
 	            return $http.get('/api/cats');
 	        },
 
-	        getData : function(category, keyword) {
-
+	        getData : function(category) {
+	        	return $http.get('/api/cat/' + category);
 	        }
 		}
 		
@@ -33,7 +33,7 @@
 	    			var activeCats = [];
 					for (var i = 0; i < cat.data.length; i++){
 						if (cat.data[i].active){
-							activeCats[i] = ({'id':cat.data[i]._id, 'name':cat.data[i].name});
+							activeCats[i] = cat.data[i];
 						}
 					}
 					return activeCats;

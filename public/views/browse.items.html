@@ -1,0 +1,40 @@
+<aside class="col-md-3">
+	<h3>Filter</h3>
+
+	<div class="widget">
+		<h1>Sort By:</h1>
+		<div class="sort">
+			<ul>
+				<li ng-click="sort = '-price'">Price: Highest to Lowest</li>
+				<li ng-click="sort = 'price'">Price: Lowest to Highest</li>
+				<li ng-click="sort = '-insertDate'">Date: Newsest to Oldest</li>
+				<li  ng-click="sort = 'insertDate'">Date: Oldest to Newest</li>
+			</ul>
+		</div>
+	</div>
+</aside>
+
+<div class="main-content col-md-9">
+	<div class="cat-header">{{ catName }} </div>
+	<div ng-show="!items">
+		There are no {{ catName }} to display!
+	</div>
+
+	<div ng-repeat="item in items | orderBy:sort | filter:filters" ng-class="{'last':$last}">
+		<div class="item row">
+			<div class="item-image col-md-4">
+				<img src="{{ item.imgThumb }}" />
+			</div>
+
+			<div class="col-md-8">
+				<div class="item-name"><a href="/item/{{ item.shortName }}/{{ item._id }}">{{ item.name }}</a></div>
+				<div class="item-price">{{ item.price | currency }}</div>
+				<div class="item-date"><strong>Added:</strong> {{ item.insertDate | date:'MM/dd/yyyy' }}</div>
+				<!--<div class="item-desc" ng-bind-html="item.description"></div>-->
+			</div>
+		</div>
+	</div>
+</div>
+<!--
+{{ items }}
+-->

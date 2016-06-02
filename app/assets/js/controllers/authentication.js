@@ -13,8 +13,12 @@
     };
 
     angular.module('Authentication').controller('login', login);
-    function login($scope, $rootScope, User, $location, $route, $cookies) {
-       
+    function login($scope, $rootScope, User, $location, $route, $routeParams, $cookies) {
+        // is there a redirect?
+        $scope.redirect = '';
+        if($routeParams.ref){
+            $scope.redirect = $routeParams.ref;
+        };
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
@@ -35,8 +39,11 @@
                     $rootScope.showMenu = true;
                     $rootScope.$broadcast('loginStateChange');
 
-                    $location.path('/myaccount');
-                    $route.reload();
+                    if ($scope.redirect != ''){
+                        $location.path($scope.redirect).search($routeParams.action);
+                    }else{
+                        $location.path('/myaccount');    
+                    }
 				};
 			});
         }

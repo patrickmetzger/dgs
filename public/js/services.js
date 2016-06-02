@@ -37,8 +37,8 @@
 	            return $http.get('/api/cats');
 	        },
 
-	        getData : function(category, keyword) {
-
+	        getData : function(category) {
+	        	return $http.get('/api/cat/' + category);
 	        }
 		}
 		
@@ -56,13 +56,70 @@
 	    			var activeCats = [];
 					for (var i = 0; i < cat.data.length; i++){
 						if (cat.data[i].active){
-							activeCats[i] = ({'id':cat.data[i]._id, 'name':cat.data[i].name});
+							activeCats[i] = cat.data[i];
 						}
 					}
 					return activeCats;
 				});
 	    	}
 		}
+	}
+
+})();
+// public/js/services/itemService.js
+(function () {
+    'use strict';
+
+    angular.module('ItemService', []);
+	
+    angular
+        .module('ItemService')
+        .factory('items', items);
+	function items($http) {
+
+		var itemsByCat = function(catID){
+			return $http.get('/api/items/' + catID);
+		};
+
+		return {
+			getItemsByCat : function(catID) {
+	            return itemsByCat(catID);
+	        }
+		}
+		
+	}
+
+	angular
+        .module('ItemService')
+        .factory('item', item);
+
+	function item($http) {
+		var itemByID = function(id){
+			return $http.get('/api/item/' + id);
+		}
+		return {
+			getItemByID: function(itemID) {
+				// we need to get the number first.
+			    return itemByID(itemID);
+		    }
+		}
+		
+	}
+
+	angular
+        .module('ItemService')
+        .factory('countItem', count);
+	function count() {
+		return {
+			add: function(itemID) {
+				// we need to get the number first.
+			    //console.log(itemID);
+		    },
+		    get: function(stateName) {
+		      //console.log(stateName);
+		    }
+		}
+		
 	}
 
 })();
@@ -101,12 +158,10 @@ angular.module('NerdService', []).factory('Nerd', ['$http', function($http) {
     function searching($http, catList, $sce) {
         return {
             getData : function(category, keyword) {
-                console.log(category);
             },
 
             GetCatById : function ($category, $keyword) {
                 $scope.test = 'testing';
-                console.log($scope.test);
             },
 
             getCatData : function ($category, $keyword) {
@@ -309,12 +364,19 @@ angular.module('UserService')
 
         var loginState = false;
 
-        var checkBearerToken = function(){
+        var checkBearerToken = function(ref, action){
             var activeSession = $cookies.getObject("dgsUserAuth");
             if (activeSession){
                 loginState = true;
-                return true;
+            }else{
+                // lets redirect to the login page with a redirect back to page.
+                if (action != ''){
+                    $location.path('/login').search({'ref': ref, 'action': action});    
+                }else{
+                    $location.path('/login').search('ref', ref);
+                }
             }
+            return loginState;
         };
 
         var activeUserProfile = function(){
@@ -322,6 +384,31 @@ angular.module('UserService')
                 var activeSession = $cookies.getObject("dgsUserAuth");
                 return $http.get('/api/user/' + activeSession.token);
             }
+        }
+
+        var userWishList = function(uID){
+            return $http.get('/api/wishlist' + uID);
+        }
+
+        var userWatchList = function(uID){
+            return $http.get('/api/watchlist' + uID);
+        }
+
+        var getUID = function(){
+            var activeSession = $cookies.getObject("dgsUserAuth");
+            if (activeSession){
+                return activeSession.token;
+            }else{
+                return undefined;
+            }
+            
+        }
+
+        var returnUserID = function(){
+            //if (checkBearerToken()){
+                var activeSession = $cookies.getObject("dgsUserAuth");
+                return activeSession;
+            //}
         }
 
         var logout = function(){
@@ -337,9 +424,16 @@ angular.module('UserService')
         };
 
         return {
+            getWatchList : function(uID){
+                return userWatchList(uID);
+            },
 
-            checkAccessToken: function(){
-                return checkBearerToken();
+            getUserId : function(){
+                return returnUserID();
+            },
+
+            checkAccessToken: function(ref, action){
+                return checkBearerToken(ref, action);
             },
 
             // call to get all nerds
@@ -387,3 +481,69 @@ angular.module('UserService')
         }       
 
     };
+// public/js/services/itemService.js
+(function () {
+    'use strict';
+
+    angular.module('WishListService', ['UserService']);
+	
+    angular.module('WishListService').factory('wList', wishlist);
+	function wishlist($http, User) {
+
+		var deletingItem = function(itemID, action){
+			var userData = User.getUserId();
+			if (userData){
+				// add to users wishlist
+				var data = {
+	                'userID' : userData.token,
+	                'itemID' : itemID,
+	                'action' : action
+	            };
+	            
+	            return $http.post('/api/user/wishlist', data);
+			}
+		}
+
+		var addingItem = function(itemID, action){
+			var userData = User.getUserId();
+			if (userData){
+				// add to users wishlist
+				var data = {
+	                'userID' : userData.token,
+	                'itemID' : itemID,
+	                'action' : action
+	            };
+
+	            return $http.post('/api/user/wishlist', data);
+			}
+		}
+		
+		var inWishList = function(itemID){
+            var userData = User.getUserId();
+            var inWL = false;
+
+            if (userData){
+            	var userID = userData.token;
+            	return $http.get('/api/user/wishlist/' + userID + '/' + itemID);
+            }else{
+            	return undefined;
+            }
+
+        };
+
+		return {
+			adding: function(itemID, action){
+				return addingItem(itemID, action);
+			},
+			checkWishList : function(itemID) {                
+                return inWishList(itemID);
+            },
+            removing: function(itemID, action){
+            	return deletingItem(itemID, action);	
+            }
+		}
+
+		
+	}
+
+})();

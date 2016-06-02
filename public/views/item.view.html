@@ -1,0 +1,28 @@
+<div id="item" ng-controller="item">
+	<div class="row">
+		<div class="item-image col-md-5">
+			<img src="{{ itemData.imgFull }}" />
+		</div>
+		<div class="item-detail col-md-7">
+			<h1>{{ itemData.name }}</h1>
+			<div class="item-price">
+				<strong>USD: {{ itemData.price | currency }}</strong> &nbsp;  &nbsp;  &nbsp; <a class="btn btn-primary" href="#">
+				<i class="fa fa-shopping-cart" aria-hidden="true"></i></i> Purchase Item</a>
+			</div>
+
+			<div class="itemdtl">
+				<h2>Item Description</h2>
+				<div ng-bind-html="itemData.description"></div>
+			</div>
+
+			<add-to-buttons></add-to-buttons>
+
+  			<!-- start seller information -->
+  			<div class="itemdtl">
+				<h2>Seller Information</h2>
+			</div>
+
+		</div>
+	</div>
+{{ itemData }}
+</div>

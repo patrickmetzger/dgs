@@ -12,6 +12,7 @@
             <span ng-show="loginData.password.$touched && loginData.password.$invalid" class="text-danger">Password is required!</span>
 	    </div>
 	    <div class="col-md-12">
+	    	<input ng-model="redirect" name="redirect" type="hidden" />
 	    	<button type="submit" ng-disabled="loginData.$invalid" class="btn btn-primary">Sign In</button>
 	    </div>
 	</form>

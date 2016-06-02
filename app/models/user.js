@@ -4,15 +4,16 @@ var bcrypt              = require("bcryptjs");
 var SALT_WORK_FACTOR    = 10;
 
 var UserSchema = new Schema({
-    fName : {type : String, default: '', required: true},
-    lName : {type : String, default: '', required: true},
-    fullName : {type : String, default: '', required: true},
+    fName : {type : String, default: '', required: false},
+    lName : {type : String, default: '', required: false},
+    fullName : {type : String, default: '', required: false},
     email : { type: String, required: true, index: { unique: true } },
-    zipCode : {type : Number, default: '', required: true},
+    zipCode : {type : Number, default: '', required: false},
     url : {type : String, default: ''},
     imgThumb : {type : String, default: ''},
     imgFull : {type : String, default: ''},
-    password : {type : String, required: true, default: ''}
+    password : {type : String, required: false, default: ''},
+    wishlist : { type: [], required: false }
 });
 
 UserSchema.pre('save', function(next) {

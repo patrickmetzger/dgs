@@ -1,6 +1,13 @@
 <h1>Browse Items</h1>
 
 <div ng-repeat="cats in allCats">
-
-	{{ cats }}
+	<div class="col-md-2 text-center">
+		<a href="/browse-items/{{ cats.shortName }}">
+		<div>
+			<img ng-src="{{ cats.imgThumb }}" />
+		</div>
+		<div>{{ cats.name }}</div>
+		</a>
+	</div>
+	
 </div>

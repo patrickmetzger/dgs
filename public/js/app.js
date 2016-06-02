@@ -3,10 +3,9 @@ angular.module('dgs', [
 	'ngRoute', 
 	'appRoutes', 
 	'ngCookies',
+	'ngSanitize',
 	'ValidationDirectives',
 	'MainCtrl', 
-	'NerdCtrl', 
-	'NerdService', 
 	'UserService', 
 	'AdminCtrl',
 	'Register',
@@ -18,12 +17,23 @@ angular.module('dgs', [
 	'Header',
 	'Search',
 	'Browse',
-	'Authentication'
+	'Authentication',
+	'dgs.profile',
+	'dgs.watchlist',
+	'dgs.searchform',
+	'dgs.addToButtons',
+	'Item',
+	'ItemService',
+	'WishListService'
 ]);
 
-angular.module('dgs').run(function ($rootScope, $location, $route, User) {
+angular.module('dgs').run(function ($rootScope, $location, $route, User, countItem) {
   $rootScope.$on('$routeChangeStart',
     function (event, next, current) {
+    	if (next.params.hasOwnProperty('item')){
+    		countItem.add(next.params.itemID);
+    	}
+
     	if (next.restricted && !User.checkLogin()){
     		$location.path('/login');
 			$route.reload();
@@ -63,6 +73,16 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
         .when('/browse-items', {
             templateUrl: 'views/browse.view.html',
             controller: "browse",
+            restricted: false
+        })
+        .when('/browse-items/:catType', {
+            templateUrl: 'views/browse.items.html',
+            controller: "browseItems",
+            restricted: false
+        })
+        .when('/item/:item/:itemID', {
+            templateUrl: 'views/item.view.html',
+            controller: "item",
             restricted: false
         })
         .when('/login', {

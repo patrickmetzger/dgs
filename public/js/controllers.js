@@ -4,15 +4,9 @@
     angular.module('Account', ['SearchService', 'UserService', 'CatService', 'AccountService']);
 
     angular.module('Account').controller('account', account);
-    function account($scope, $http, $location, $rootScope, User, searching, category, accountInfo) {
+    function account($scope, $http, $location, $rootScope, User, category, accountInfo) {
 
         $scope.title = 'My Account';
-
-        $scope.activeProfile = User.getProfile().then(function(response){
-			var dataResponse = response.data;
-			$scope.profile = dataResponse;
-			console.log($scope.profile);
-		});
 
 
     }
@@ -43,8 +37,12 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     };
 
     angular.module('Authentication').controller('login', login);
-    function login($scope, $rootScope, User, $location, $route, $cookies) {
-       
+    function login($scope, $rootScope, User, $location, $route, $routeParams, $cookies) {
+        // is there a redirect?
+        $scope.redirect = '';
+        if($routeParams.ref){
+            $scope.redirect = $routeParams.ref;
+        };
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
@@ -65,8 +63,11 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
                     $rootScope.showMenu = true;
                     $rootScope.$broadcast('loginStateChange');
 
-                    $location.path('/myaccount');
-                    $route.reload();
+                    if ($scope.redirect != ''){
+                        $location.path($scope.redirect).search($routeParams.action);
+                    }else{
+                        $location.path('/myaccount');    
+                    }
 				};
 			});
         }
@@ -81,23 +82,42 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
 (function () {
     'use strict';
 
-    angular.module('Browse', ['SearchService', 'CatService']);
+    angular.module('Browse', ['SearchService', 'CatService', 'ItemService']);
 
     angular.module('Browse').controller('browse', browse);
-    function browse($scope, $http, $location, $rootScope, searching, category, catList) {
-
+    function browse($scope, $http, $location, $rootScope, category, catList) {
     	catList.getActiveList().then(function(cats){
 			$scope.allCats = cats;
 		});
+    }
 
-        $scope.searching = function(){
-            $location.path('/search?category=' + $scope.category + '&keyword=' + $scope.keyword);
-            searching.getData($scope.category, $scope.keyword);
-            
+    angular.module('Browse').controller('browseItems', browseitems);
+    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $routeParams) {
+
+        category.getData($routeParams.catType).then(function(catData){
+            if (catData.data && catData.data._id != ''){
+                var catID = catData.data._id;
+                $scope.catName = catData.data.name;
+                $scope.items = '';
+                // Get all items based on catID
+                items.getItemsByCat(catID).then(function(items){
+                    if (items.data.length > 0){
+                        $scope.items = items.data;
+                    }
+                });
+            }
+        });
+
+        $scope.filters = {};
+        $scope.sort = 'price';
+
+        $scope.category = $routeParams.category;
+        $scope.keyword = $routeParams.keyword;
+        if ($scope.keyword != ''){
+            $scope.filters["name"] = $scope.keyword;
         }
 
-
-
+        return undefined;
     }
 
     
@@ -125,6 +145,25 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
         });
 
 	}
+
+})();
+
+(function () {
+    'use strict';
+
+    angular.module('Item', ['SearchService', 'CatService', 'ItemService']);
+
+    angular.module('Item').controller('item', item);
+    function item($scope, $http, $location, $rootScope, $routeParams, searching, category, item) {
+        // get Item data
+    	item.getItemByID($routeParams.itemID).then(function(response){
+            $scope.itemData = response.data;
+            $scope.status = response.status;
+        }, function(response) {
+            $scope.itemData = "Request failed";
+            $scope.status = response.status;
+        });
+    }   
 
 })();
 
@@ -210,19 +249,22 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
     angular.module('Search', ['SearchService', 'CatService']);
 
     angular.module('Search').controller('search', search);
-    function search($scope, $http, $location, $rootScope, searching, category) {
-       
-        $scope.searching = function(){
-            $location.path('/search?category=' + $scope.category + '&keyword=' + $scope.keyword);
-            searching.getData($scope.category, $scope.keyword);
-            
+    function search($scope, $http, $location, $rootScope, $route, $routeParams, searching, category) {
+        $scope.category = $routeParams.category;
+        $scope.keyword = $routeParams.keyword;
+
+        if($location.$$search.keyword){
+            $scope.keyword = $location.$$search.keyword;            
         }
 
-
-
+        $scope.searching = function(){
+            if ($scope.keyword != ''){
+                $location.path('/browse-items/' + $scope.category).search('keyword', $scope.keyword);    
+            }else{
+                $location.path('/browse-items/' + $scope.category).search({});
+            }            
+        }
     }
-
-    
 
 })();
 

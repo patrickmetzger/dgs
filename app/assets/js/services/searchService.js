@@ -10,12 +10,10 @@
     function searching($http, catList, $sce) {
         return {
             getData : function(category, keyword) {
-                console.log(category);
             },
 
             GetCatById : function ($category, $keyword) {
                 $scope.test = 'testing';
-                console.log($scope.test);
             },
 
             getCatData : function ($category, $keyword) {

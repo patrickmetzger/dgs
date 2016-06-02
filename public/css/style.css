@@ -22,6 +22,49 @@ ul.navbar-nav {
 #main {
   margin-top: 25px; }
 
+.main-content {
+  border: 1px solid #D4DDF3;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+  .main-content .cat-header {
+    margin: 10px 0;
+    font-size: 18px; }
+  .main-content .item {
+    font-size: 16px;
+    margin: 0 1px;
+    padding: 10px 0;
+    border-bottom: 1px solid #cccccc; }
+    .main-content .item .item-image {
+      max-height: 225px;
+      max-width: 225px; }
+    .main-content .item .item-name {
+      font-size: 26px;
+      color: #1979CA; }
+
+aside .widget h1 {
+  font-size: 14px; }
+
+aside .widget ul {
+  list-style-type: none;
+  padding: 0; }
+  aside .widget ul li {
+    margin-left: 5px;
+    list-style: none; }
+
+aside .widget .sort li {
+  color: #1979CA; }
+
+#item .item-image {
+  max-width: 500px; }
+  #item .item-image img {
+    max-width: 100%; }
+
+#item .itemdtl h2 {
+  font-size: 14px;
+  border-bottom: 1px solid grey; }
+
 @media (min-width: 768px) {
   .nav-top {
     height: 95px; }

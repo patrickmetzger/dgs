@@ -3,7 +3,10 @@ var express     = require('express');
 // grab the nerd model we just created
 var DGS         = require('./models/nerd');
 var User        = require('./models/user');
+var Item        = require('./models/item');
 var CATS        = require('./models/cats');
+var WishLists    = require('./models/wishlist');
+var Watchlist   = require('./models/watchlist');
 
     module.exports = function(app) {
 
@@ -13,7 +16,6 @@ var CATS        = require('./models/cats');
         
         app.post('/api/authenticate', function(req, res, cb) {
             // find the user
-           
             User.findOne({email: req.body.email}, function(err, user) {
                 if (err) throw err;
 
@@ -86,6 +88,133 @@ var CATS        = require('./models/cats');
             });
         });
 
+        // update USER
+        app.post('/api/user/wishlist', function(req, res, next) {
+            console.log(req.body);
+            if (req.body.action == 'delete'){
+                User.findByIdAndUpdate(
+                    req.body.userID,
+                    {$pull: {wishlist: req.body.itemID}},
+                    {safe: true, upsert: true},
+                    function(err, user) {
+                        if(err){ return next(err); }
+
+                        console.log('Wishlist item successfully deleted!');
+                    }
+                );
+            }else if (req.body.action == 'add'){
+                // dup check this itemID
+                User.findOne({ _id: req.body.userID }).where('wishlist').eq(req.body.itemID).exec(function(err, data) {
+                  if (err) throw err;
+                  if (!data){
+                    User.findByIdAndUpdate(
+                        req.body.userID,
+                        {$push: {wishlist: req.body.itemID}},
+                        {safe: true, upsert: true},
+                        function(err, user) {
+                            if(err){ return next(err); }
+
+                            console.log('User successfully updated!');
+                        }
+                    );
+                  }else{
+                    return 'Item already exists';
+                  }
+                  
+                });
+
+                
+            }
+            
+        });
+
+        app.get('/api/user/wishlist/:userID/:itemID', function(req, res, next) {
+            // use mongoose to get watchlist if one exists
+            User.findOne({ _id: req.params.userID }).where('wishlist').eq(req.params.itemID).exec(function(err, data) {
+                if (err) return console.error(err);
+                    console.log(data);
+                    res.json(data)
+            });
+        });
+
+        app.post('/api/wishlist', function(req, res) {
+
+            // dup check this itemID
+            User.findOne({ _id: req.body.userID }).where('wishlist').eq(req.body.itemID).exec(function(err, data) {
+              if (err) throw err;
+
+              // show the admins in the past month
+              console.log(users);
+            });
+
+
+            /*
+            var wlPost;
+            wlPost = new WishLists({
+                userID : req.body.userID,
+                itemID : req.body.itemID
+            });
+           
+            wlPost.save(function(err, wlPost){
+                if(err){ return next(err); }
+
+                res.json(wlPost);
+            });*/
+        });
+
+        // STARTING ITEMS
+        app.get('/api/items', function(req, res) {
+            // use mongoose to get all items in the database
+            Item.find(function(err, Item) {
+                // if there is an error retrieving, send the error. 
+                // nothing after res.send(err) will execute
+                if (err)
+                    res.send(err);
+
+                res.json(Item); // return all items in JSON format
+            });
+        });
+
+        app.get('/api/items/:catID', function(req, res, next) {
+            // use mongoose to get item if one exists
+            Item.find({ "catID": req.params.catID }, function(err, data) {
+                if (err) return console.error(err);
+                    res.json(data)
+            });
+        });
+
+        app.get('/api/item/:id', function(req, res, next) {
+            // use mongoose to get item if one exists    //req.params.id
+            Item.findOne({ _id: req.params.id }, function(err, data) {
+                if (err) return console.error(err);
+                    res.json(data)
+            });
+        });
+
+        app.post('/api/item', function(req, res) {
+            var itemPost;
+            itemPost = new Item({
+                name : req.body.name,
+                shortName : req.body.shortName,
+                description : req.body.description,
+                price : req.body.price,
+                catID : req.body.catID,
+                sellerID : req.body.sellerID,
+                imgThumb : req.body.imgThumb,
+                imgFull : req.body.imgFull,
+                active : req.body.active,
+                location : req.body.location,
+                keywords : req.body.keywords,
+                viewed : req.body.viewed
+            });
+           
+            itemPost.save(function(err, itemPost){
+                if(err){ return next(err); }
+
+                res.json(itemPost);
+            });
+        });
+
         // STARTING CATS
         app.get('/api/cats', function(req, res) {
             // use mongoose to get all CATS in the database
@@ -98,6 +227,15 @@ var CATS        = require('./models/cats');
                 res.json(CATS); // return all CATS in JSON format
             });
         });
+
+        app.get('/api/cat/:name', function(req, res, next) {
+            // use mongoose to get item if one exists
+            CATS.findOne({ shortName: req.params.name }, function(err, data) {
+                if (err) return console.error(err);
+                    res.json(data)
+            });
+        });
+        // END CATS
 
         // sample api route
         app.get('/api/nerds', function(req, res) {

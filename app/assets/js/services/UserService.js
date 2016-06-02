@@ -11,12 +11,19 @@ angular.module('UserService')
 
         var loginState = false;
 
-        var checkBearerToken = function(){
+        var checkBearerToken = function(ref, action){
             var activeSession = $cookies.getObject("dgsUserAuth");
             if (activeSession){
                 loginState = true;
-                return true;
+            }else{
+                // lets redirect to the login page with a redirect back to page.
+                if (action != ''){
+                    $location.path('/login').search({'ref': ref, 'action': action});    
+                }else{
+                    $location.path('/login').search('ref', ref);
+                }
             }
+            return loginState;
         };
 
         var activeUserProfile = function(){
@@ -24,6 +31,31 @@ angular.module('UserService')
                 var activeSession = $cookies.getObject("dgsUserAuth");
                 return $http.get('/api/user/' + activeSession.token);
             }
+        }
+
+        var userWishList = function(uID){
+            return $http.get('/api/wishlist' + uID);
+        }
+
+        var userWatchList = function(uID){
+            return $http.get('/api/watchlist' + uID);
+        }
+
+        var getUID = function(){
+            var activeSession = $cookies.getObject("dgsUserAuth");
+            if (activeSession){
+                return activeSession.token;
+            }else{
+                return undefined;
+            }
+            
+        }
+
+        var returnUserID = function(){
+            //if (checkBearerToken()){
+                var activeSession = $cookies.getObject("dgsUserAuth");
+                return activeSession;
+            //}
         }
 
         var logout = function(){
@@ -39,9 +71,16 @@ angular.module('UserService')
         };
 
         return {
+            getWatchList : function(uID){
+                return userWatchList(uID);
+            },
 
-            checkAccessToken: function(){
-                return checkBearerToken();
+            getUserId : function(){
+                return returnUserID();
+            },
+
+            checkAccessToken: function(ref, action){
+                return checkBearerToken(ref, action);
             },
 
             // call to get all nerds

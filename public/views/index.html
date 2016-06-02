@@ -9,6 +9,7 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="libs/angular-material/angular-material.css">
     <link rel="stylesheet" href="css/style.css"> <!-- custom styles -->
 
@@ -43,17 +44,7 @@
         </div>
         <div class="nav-top col-lg-4 col-md-6 col-sm-12">
             <div class="navbar-header search">
-                <form ng-controller="search" name="search" class="navbar-form navbar-left" ng-submit="searching()" role="search">
-                    <div class="form-group">
-                      <input type="text" class="form-control" ng-model="keyword" placeholder="keyword">
-                    </div>
-                    <div class="form-group">
-                        <select class="form-control" ng-model="category" ng-options="cat.name as cat.name for cat in activeCatList">
-                            <option value="">-- choose category --</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-default">Search</button>
-                </form>
+                <search-form></search-form>
             </div>
         </div>
         <div class="col-md-12 nav-bottom">

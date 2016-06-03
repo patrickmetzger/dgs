@@ -65,6 +65,15 @@ aside .widget .sort li {
   font-size: 14px;
   border-bottom: 1px solid grey; }
 
+/***************** SELLER *************/
+.sellerData {
+  margin-top: 30px;
+  border: 1px solid grey;
+  border-radius: 5px; }
+  .sellerData h2 {
+    margin-top: 10px;
+    font-size: 14px; }
+
 @media (min-width: 768px) {
   .nav-top {
     height: 95px; }

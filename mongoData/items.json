@@ -1,0 +1,51 @@
+[
+  {
+    "_id": "57327436ba8d1e8c43b3657c",
+    "catID": [
+      "5716b3bace6fae084a067ef6"
+    ],
+    "name": "Clothing test item 2",
+    "shortName": "clothing-test-item-2",
+    "active": true,
+    "imgThumb": "/imgs/cats/clothing.gif",
+    "imgFull": "/imgs/uploads/69_62290998.jpg",
+    "price": "29.99",
+    "location": "80920",
+    "sellerID": "5717ffe9986f60b08668b7cc",
+    "description": "This is a test descriptionThis is a test",
+    "insertDate": 1463006770000,
+    "keywords": [
+      "clothing",
+      "test",
+      "item",
+      "2"
+    ],
+    "viewed": 0
+  },
+  {
+    "_id": "5730ccc42def3138cf4f991b",
+    "catID": [
+      "5716b3bace6fae084a067ef6",
+      "57213d84ce6fae084a067ef8"
+    ],
+    "name": "PRO-Keds Custom Shoes",
+    "shortName": "pro-keds-custom-shoes",
+    "active": true,
+    "imgThumb": "/imgs/cats/clothing.gif",
+    "imgFull": "/imgs/uploads/69_62290998.jpg",
+    "itemCondition": "Like New",
+    "price": "15.99",
+    "location": "80920",
+    "sellerID": "5717ffe9986f60b08668b7cc",
+    "description": "<p>This is a test description</p><p>This is a test</p>",
+    "insertDate": 1463179275000,
+    "keywords": [
+      "clothing",
+      "test",
+      "item",
+      "testing",
+      "again"
+    ],
+    "viewed": 0
+  }
+]

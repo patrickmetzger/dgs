@@ -1,0 +1,71 @@
+[
+  {
+    "_id": "571ea063f7d8db187b654ff7",
+    "imgFull": "",
+    "imgThumb": "",
+    "url": "",
+    "zipCode": 80920,
+    "email": "test@test.com",
+    "fullName": "Patrick Metzger",
+    "lName": "Metzger",
+    "fName": "Patrick",
+    "__v": 0
+  },
+  {
+    "_id": "5723ae5c0429f7e8cf391e92",
+    "email": "pjmetzger76@gmail.comm",
+    "password": "$2a$10$.0Cgh0amaDB.cYw0zD9CQeyHBuKfdxyYOrMeXrBjpXJFSQo3EFB9K",
+    "imgFull": "",
+    "imgThumb": "",
+    "url": "",
+    "zipCode": 80920,
+    "fullName": "Patrick Metzger",
+    "lName": "Metzger",
+    "fName": "Patrick",
+    "roles": [
+      "admin",
+      "buyer",
+      "seller"
+    ],
+    "__v": 0,
+    "wishlist": [
+      "57327436ba8d1e8c43b3657c"
+    ]
+  },
+  {
+    "_id": "572913d2eedf13e129864c54",
+    "email": "pjmetzger76@gmail.test",
+    "password": "$2a$10$ad2n32bf4HRLkxqdARp4/Oz.HmmrsWLvSKZaHTx8TUx0LrTa69qOe",
+    "imgFull": "",
+    "imgThumb": "",
+    "url": "",
+    "zipCode": 80920,
+    "fullName": "Patrick Metzger",
+    "lName": "Metzger",
+    "fName": "Patrick",
+    "__v": 0
+  },
+  {
+    "_id": "5717ffe9986f60b08668b7cc",
+    "imgFull": "",
+    "imgThumb": "",
+    "email": "pjmetzger76@gmail.com",
+    "zipCode": "80920",
+    "url": "",
+    "fullName": "PJ Metzger",
+    "lName": "Metzger",
+    "fName": "PJ",
+    "roles": [
+      "admin",
+      "buyer",
+      "seller"
+    ],
+    "wishlist": [
+      "123456789",
+      "1234567891234",
+      "123456789123456789",
+      "12345678912345678910111213"
+    ],
+    "__v": 2
+  }
+]

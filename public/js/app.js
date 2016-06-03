@@ -22,6 +22,7 @@ angular.module('dgs', [
 	'dgs.watchlist',
 	'dgs.searchform',
 	'dgs.addToButtons',
+	'dgs.sellerInfo',
 	'Item',
 	'ItemService',
 	'WishListService'

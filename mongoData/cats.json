@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "57213d60ce6fae084a067ef7",
+    "name": "Pins",
+    "active": true,
+    "imgThumb": "/imgs/cats/pins.gif",
+    "shortName": "pins"
+  },
+  {
+    "_id": "57213d84ce6fae084a067ef8",
+    "name": "WDCC",
+    "active": true,
+    "imgThumb": "/imgs/cats/wdcc.gif",
+    "shortName": "wdcc"
+  },
+  {
+    "_id": "5716b3bace6fae084a067ef6",
+    "name": "Clothing",
+    "active": true,
+    "imgThumb": "/imgs/cats/clothing.gif",
+    "shortName": "clothing"
+  }
+]

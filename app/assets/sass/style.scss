@@ -114,6 +114,17 @@ aside {
 	}
 }
 
+/***************** SELLER *************/
+.sellerData {
+	margin-top:30px;
+	border: 1px solid grey;
+	@include border-radius(5px);
+	h2 {
+		margin-top:10px;
+		font-size:14px;
+	}
+}
+
 
 @media (min-width: 768px) {
 	.nav-top {

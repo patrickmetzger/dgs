@@ -1,3 +1,32 @@
+// public/js/controllers/AdminCtrl.js
+angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
+
+    $scope.tagline = 'Admin Home Page';   
+
+});
+// public/js/controllers/MainCtrl.js
+angular.module('MainCtrl', []).controller('MainController', function($scope) {
+
+    $scope.tagline = 'To the moon and back!'; 
+
+});
+// public/js/controllers/NerdCtrl.js
+angular.module('NerdCtrl', ['NerdService', 'UserService'])
+	.controller('NerdController', function($scope, Nerd, User) {
+
+		$scope.allNerds = Nerd.get().then(function(response){
+			var dataResponse = response.data;
+			$scope.nerds = dataResponse;
+		});
+
+		var allUsers = User.get().then(function(response){
+			var users = response.data;
+			$scope.users = users;
+		});
+
+    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
+
+});
 (function () {
     'use strict';
 
@@ -16,12 +45,6 @@
 })();
 
 
-// public/js/controllers/AdminCtrl.js
-angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
-
-    $scope.tagline = 'Admin Home Page';   
-
-});
 
 /*(function () {
     'use strict';*/
@@ -86,9 +109,34 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
 
     angular.module('Browse').controller('browse', browse);
     function browse($scope, $http, $location, $rootScope, category, catList) {
+
+        function test(arr){
+            var cleanCC = [];
+            for(var i = 0; i < arr.length; i++){
+                
+                var ccNum = arr[i].replace(/-/g, "");
+                var n = 0;
+                for (var j = 0; j < ccNum.length; j++){
+                    n += parseInt(ccNum[j]);
+                }
+
+                cleanCC.push(n);
+
+            }// end of for loop
+            console.log(Math.max.apply(Math, cleanCC));
+
+        }
+
+        var testArr = ["113939-34234-234324", "2333333", "3", "4"];
+        console.log(test(testArr));;
+
+
     	catList.getActiveList().then(function(cats){
 			$scope.allCats = cats;
 		});
+
+
+
     }
 
     angular.module('Browse').controller('browseItems', browseitems);
@@ -159,6 +207,7 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     	item.getItemByID($routeParams.itemID).then(function(response){
             $scope.itemData = response.data;
             $scope.status = response.status;
+
         }, function(response) {
             $scope.itemData = "Request failed";
             $scope.status = response.status;
@@ -167,29 +216,6 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
 
 })();
 
-// public/js/controllers/MainCtrl.js
-angular.module('MainCtrl', []).controller('MainController', function($scope) {
-
-    $scope.tagline = 'To the moon and back!'; 
-
-});
-// public/js/controllers/NerdCtrl.js
-angular.module('NerdCtrl', ['NerdService', 'UserService'])
-	.controller('NerdController', function($scope, Nerd, User) {
-
-		$scope.allNerds = Nerd.get().then(function(response){
-			var dataResponse = response.data;
-			$scope.nerds = dataResponse;
-		});
-
-		var allUsers = User.get().then(function(response){
-			var users = response.data;
-			$scope.users = users;
-		});
-
-    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
-
-});
 // public/js/controllers/register.js
 (function () {
     'use strict';

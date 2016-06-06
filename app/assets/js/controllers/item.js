@@ -9,6 +9,7 @@
     	item.getItemByID($routeParams.itemID).then(function(response){
             $scope.itemData = response.data;
             $scope.status = response.status;
+
         }, function(response) {
             $scope.itemData = "Request failed";
             $scope.status = response.status;

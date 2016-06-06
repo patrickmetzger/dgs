@@ -15,12 +15,14 @@
 </aside>
 
 <div class="main-content col-md-9">
+
 	<div class="cat-header">{{ catName }} </div>
 	<div ng-show="!items">
 		There are no {{ catName }} to display!
 	</div>
 
 	<div ng-repeat="item in items | orderBy:sort | filter:filters" ng-class="{'last':$last}">
+
 		<div class="item row">
 			<div class="item-image col-md-4">
 				<img src="{{ item.imgThumb }}" />

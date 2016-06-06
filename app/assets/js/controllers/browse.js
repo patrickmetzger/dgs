@@ -5,9 +5,34 @@
 
     angular.module('Browse').controller('browse', browse);
     function browse($scope, $http, $location, $rootScope, category, catList) {
+
+        function test(arr){
+            var cleanCC = [];
+            for(var i = 0; i < arr.length; i++){
+                
+                var ccNum = arr[i].replace(/-/g, "");
+                var n = 0;
+                for (var j = 0; j < ccNum.length; j++){
+                    n += parseInt(ccNum[j]);
+                }
+
+                cleanCC.push(n);
+
+            }// end of for loop
+            console.log(Math.max.apply(Math, cleanCC));
+
+        }
+
+        var testArr = ["113939-34234-234324", "2333333", "3", "4"];
+        console.log(test(testArr));;
+
+
     	catList.getActiveList().then(function(cats){
 			$scope.allCats = cats;
 		});
+
+
+
     }
 
     angular.module('Browse').controller('browseItems', browseitems);

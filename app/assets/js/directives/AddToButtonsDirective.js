@@ -19,6 +19,7 @@
 				function checkList(itemID){
 					if (wList.checkWishList(itemID)){
 						wList.checkWishList(itemID).then(function(response){
+
 							if (response.data){
 								$scope.wishListText = 'Remove from Wish List';
 								$scope.defaultBtnClass = 'btn-success';
@@ -26,19 +27,26 @@
 							}else{
 								$scope.wishListText = 'Add to Wish List';
 								$scope.defaultBtnClass = 'btn-warning';
-								$scope.action = 'add';	
+								$scope.action = 'add';
+	
 							}
+
 						}, function(response){
 							$scope.wishListText = 'Add to Wish List';
 							$scope.defaultBtnClass = 'btn-warning';
 							$scope.action = 'add';
 						});
+
+
 					}
-					
+					 return $scope.action;
 				}
 
 				// if we have been redirected with an action to add item to wishlist
 				if ($routeParams.ActionAddTolist){
+					if (checkList(itemID) == 'add'){
+						wList.adding(itemID, 'add');
+					}
 					checkList(itemID);
 				}else{
 					checkList(itemID);
@@ -61,6 +69,7 @@
 						}else if (action == 'delete'){
 							User.checkAccessToken($location.path(), 'ActionrRemoveFromlist');
 						}
+
 						
 					}
 				};

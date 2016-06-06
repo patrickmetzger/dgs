@@ -19,6 +19,7 @@
 				function checkList(itemID){
 					if (wList.checkWishList(itemID)){
 						wList.checkWishList(itemID).then(function(response){
+
 							if (response.data){
 								$scope.wishListText = 'Remove from Wish List';
 								$scope.defaultBtnClass = 'btn-success';
@@ -26,19 +27,26 @@
 							}else{
 								$scope.wishListText = 'Add to Wish List';
 								$scope.defaultBtnClass = 'btn-warning';
-								$scope.action = 'add';	
+								$scope.action = 'add';
+	
 							}
+
 						}, function(response){
 							$scope.wishListText = 'Add to Wish List';
 							$scope.defaultBtnClass = 'btn-warning';
 							$scope.action = 'add';
 						});
+
+
 					}
-					
+					 return $scope.action;
 				}
 
 				// if we have been redirected with an action to add item to wishlist
 				if ($routeParams.ActionAddTolist){
+					if (checkList(itemID) == 'add'){
+						wList.adding(itemID, 'add');
+					}
 					checkList(itemID);
 				}else{
 					checkList(itemID);
@@ -61,6 +69,7 @@
 						}else if (action == 'delete'){
 							User.checkAccessToken($location.path(), 'ActionrRemoveFromlist');
 						}
+
 						
 					}
 				};
@@ -82,6 +91,53 @@
 			templateUrl: '/incs/header.html'
 		}
 	};
+
+})();
+(function () {
+    'use strict';
+
+    angular.module('ValidationDirectives', ['UserService']);
+
+    angular
+        .module('ValidationDirectives')
+        .directive('match', match);
+    function match($parse) {
+      return {
+        require: 'ngModel',
+        link: function(scope, elem, attrs, ctrl) {
+          scope.$watch(function() { 
+            return $parse(attrs.match)(scope).$$lastCommittedViewValue === ctrl.$modelValue;
+          }, function(currentValue) {
+            ctrl.$setValidity('mismatch', currentValue);
+          });
+        }
+      };
+    };
+
+
+    angular
+        .module('ValidationDirectives')
+        .directive('checkEmail', checkEmail);
+    
+    function checkEmail($timeout, $q, $http) {
+      return {
+        restrict: 'AE',
+        require: 'ngModel',
+        link: function(scope, elm, attr, model) { 
+          model.$asyncValidators.emailExists = function() {
+            // check email to make sure it doesn't exist all ready
+            var email = model.$viewValue;
+            return $http.get('/api/user/' + email).then(function(res){
+              $timeout(function(){
+                model.$setValidity('emailExists', !res.data); 
+              });
+            }); 
+            
+          };
+        }
+      } 
+    };
+
 
 })();
 (function() {
@@ -145,64 +201,15 @@
 		return {
 			restrict: 'AE',
 			scope: {
-				test: "=testing",
 				sellerID: "=sellerID"
 			},
 			templateUrl: 'views/directives/sellerInfo.html',
 			link: function(scope, element, attrs){
-				console.log(attrs.test);
 			},
 			controller: function($scope) {
 			}
 	  	};
 	}
-
-})();
-(function () {
-    'use strict';
-
-    angular.module('ValidationDirectives', ['UserService']);
-
-    angular
-        .module('ValidationDirectives')
-        .directive('match', match);
-    function match($parse) {
-      return {
-        require: 'ngModel',
-        link: function(scope, elem, attrs, ctrl) {
-          scope.$watch(function() { 
-            return $parse(attrs.match)(scope).$$lastCommittedViewValue === ctrl.$modelValue;
-          }, function(currentValue) {
-            ctrl.$setValidity('mismatch', currentValue);
-          });
-        }
-      };
-    };
-
-
-    angular
-        .module('ValidationDirectives')
-        .directive('checkEmail', checkEmail);
-    
-    function checkEmail($timeout, $q, $http) {
-      return {
-        restrict: 'AE',
-        require: 'ngModel',
-        link: function(scope, elm, attr, model) { 
-          model.$asyncValidators.emailExists = function() {
-            // check email to make sure it doesn't exist all ready
-            var email = model.$viewValue;
-            return $http.get('/api/user/' + email).then(function(res){
-              $timeout(function(){
-                model.$setValidity('emailExists', !res.data); 
-              });
-            }); 
-            
-          };
-        }
-      } 
-    };
-
 
 })();
 (function() {

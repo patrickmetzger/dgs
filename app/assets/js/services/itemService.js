@@ -26,9 +26,11 @@
         .factory('item', item);
 
 	function item($http) {
+		
 		var itemByID = function(id){
 			return $http.get('/api/item/' + id);
 		}
+
 		return {
 			getItemByID: function(itemID) {
 				// we need to get the number first.

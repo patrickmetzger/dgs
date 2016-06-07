@@ -34,6 +34,10 @@ angular.module('UserService')
 
         var loginState = false;
 
+        var userById = function(id){
+            return $http.get('/api/user/' + id);
+        };
+
         var checkBearerToken = function(ref, action){
             var activeSession = $cookies.getObject("dgsUserAuth");
             if (activeSession){
@@ -94,6 +98,10 @@ angular.module('UserService')
         };
 
         return {
+            getUserByID : function(id){
+                return userById(id);
+            },
+
             getWatchList : function(uID){
                 return userWatchList(uID);
             },
@@ -106,7 +114,7 @@ angular.module('UserService')
                 return checkBearerToken(ref, action);
             },
 
-            // call to get all nerds
+            // call to get all users
             get : function() {
                 return $http.get('/api/user');
             },
@@ -228,15 +236,25 @@ angular.module('UserService')
     angular
         .module('ItemService')
         .factory('items', items);
+
 	function items($http) {
+
+		var itemsByID = function(id){
+			return $http.get('/api/items/' + id);
+		};
 
 		var itemsByCat = function(catID){
 			return $http.get('/api/items/' + catID);
 		};
 
 		return {
+			
 			getItemsByCat : function(catID) {
 	            return itemsByCat(catID);
+	        },
+
+	        getItemsByID : function(id) {
+	            return itemsByID(id);
 	        }
 		}
 		

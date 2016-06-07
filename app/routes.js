@@ -183,6 +183,18 @@ var Watchlist   = require('./models/watchlist');
             });
         });
 
+        app.get('/api/items/:id', function(req, res, next) {
+
+            console.log(req);
+
+            
+            // use mongoose to get item if one exists
+            Item.find({ "sellerID": req.params.id }, function(err, data) {
+                if (err) return console.error(err);
+                    res.json(data)
+            });
+        });
+
         app.get('/api/item/:id', function(req, res, next) {
             // use mongoose to get item if one exists    //req.params.id
             Item.findOne({ _id: req.params.id }, function(err, data) {

@@ -11,6 +11,10 @@ angular.module('UserService')
 
         var loginState = false;
 
+        var userById = function(id){
+            return $http.get('/api/user/' + id);
+        };
+
         var checkBearerToken = function(ref, action){
             var activeSession = $cookies.getObject("dgsUserAuth");
             if (activeSession){
@@ -71,6 +75,10 @@ angular.module('UserService')
         };
 
         return {
+            getUserByID : function(id){
+                return userById(id);
+            },
+
             getWatchList : function(uID){
                 return userWatchList(uID);
             },
@@ -83,7 +91,7 @@ angular.module('UserService')
                 return checkBearerToken(ref, action);
             },
 
-            // call to get all nerds
+            // call to get all users
             get : function() {
                 return $http.get('/api/user');
             },

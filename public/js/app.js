@@ -10,6 +10,7 @@ angular.module('dgs', [
 	'AdminCtrl',
 	'Register',
 	'ngMaterial',
+	'Seller',
 	'CatService',
 	'SearchService',
 	'Account',

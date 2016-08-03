@@ -11,21 +11,33 @@
 	function items($http) {
 
 		var itemsByID = function(id){
-			return $http.get('/api/items/' + id);
+			return $http.get('/api/items/user/' + id);
 		};
 
 		var itemsByCat = function(catID){
 			return $http.get('/api/items/' + catID);
 		};
 
-		return {
+		var itemCountByID = function(id){
+			var items = $http.get('/api/items/user/' + id).then(function(response){
+				return response.data;
+			});
 			
+			return items;
+		};
+
+		return {
+
 			getItemsByCat : function(catID) {
 	            return itemsByCat(catID);
 	        },
 
 	        getItemsByID : function(id) {
 	            return itemsByID(id);
+	        },
+
+	        getItemCountByID : function(id) {
+	            return itemCountByID(id);
 	        }
 		}
 		

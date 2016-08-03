@@ -7,13 +7,15 @@ var UserSchema = new Schema({
     fName : {type : String, default: '', required: false},
     lName : {type : String, default: '', required: false},
     fullName : {type : String, default: '', required: false},
+    username : {type: String, default: '', require: false},
     email : { type: String, required: true, index: { unique: true } },
     zipCode : {type : Number, default: '', required: false},
     url : {type : String, default: ''},
     imgThumb : {type : String, default: ''},
     imgFull : {type : String, default: ''},
     password : {type : String, required: false, default: ''},
-    wishlist : { type: [], required: false }
+    wishlist : { type: [], required: false },
+    following : { type: [], required: false }
 });
 
 UserSchema.pre('save', function(next) {

@@ -51,7 +51,7 @@ var Watchlist   = require('./models/watchlist');
             });
         });
 
-        app.get('/api/user/:id', function(req, res, next) {
+        app.get('/api/user/id/:id', function(req, res, next) {
             // use mongoose to get user if one exists
             User.findOne({ _id: req.params.id }, function(err, data) {
                 if (err) return console.error(err);
@@ -88,9 +88,8 @@ var Watchlist   = require('./models/watchlist');
             });
         });
 
-        // update USER
+        // update USER wishlist
         app.post('/api/user/wishlist', function(req, res, next) {
-            console.log(req.body);
             if (req.body.action == 'delete'){
                 User.findByIdAndUpdate(
                     req.body.userID,
@@ -98,7 +97,6 @@ var Watchlist   = require('./models/watchlist');
                     {safe: true, upsert: true},
                     function(err, user) {
                         if(err){ return next(err); }
-
                         console.log('Wishlist item successfully deleted!');
                     }
                 );
@@ -113,7 +111,6 @@ var Watchlist   = require('./models/watchlist');
                         {safe: true, upsert: true},
                         function(err, user) {
                             if(err){ return next(err); }
-
                             console.log('User successfully updated!');
                         }
                     );
@@ -122,8 +119,6 @@ var Watchlist   = require('./models/watchlist');
                   }
                   
                 });
-
-                
             }
             
         });
@@ -132,7 +127,52 @@ var Watchlist   = require('./models/watchlist');
             // use mongoose to get watchlist if one exists
             User.findOne({ _id: req.params.userID }).where('wishlist').eq(req.params.itemID).exec(function(err, data) {
                 if (err) return console.error(err);
-                    console.log(data);
+                    res.json(data)
+            });
+        });
+
+        // update USER following
+        app.post('/api/user/follow', function(req, res, next) {
+            if (req.body.action == 'delete'){
+                User.findByIdAndUpdate(
+                    req.body.userID,
+                    {$pull: {following: req.body.userID}},
+                    {safe: true, upsert: true},
+                    function(err, user) {
+                        if(err){ return next(err); }
+
+                        console.log('Follow successfully deleted!');
+                    }
+                );
+            }else if (req.body.action == 'add'){
+                // dup check this itemID
+                User.findOne({ _id: req.body.userID }).where('following').eq(req.body.itemID).exec(function(err, data) {
+                  if (err) throw err;
+                  if (!data){
+                    User.findByIdAndUpdate(
+                        req.body.userID,
+                        {$push: {following: req.body.itemID}},
+                        {safe: true, upsert: true},
+                        function(err, user) {
+                            if(err){ return next(err); }
+
+                            console.log('Follow added!');
+                        }
+                    );
+                  }else{
+                    return 'User ID already exists';
+                  }
+                  
+                });
+
+                
+            }
+        });
+
+        app.get('/api/user/follow/:userID/:id', function(req, res, next) {
+            // use mongoose to get watchlist if one exists
+            User.findOne({ _id: req.params.userID }).where('following').eq(req.params.id).exec(function(err, data) {
+                if (err) return console.error(err);
                     res.json(data)
             });
         });
@@ -144,7 +184,6 @@ var Watchlist   = require('./models/watchlist');
               if (err) throw err;
 
               // show the admins in the past month
-              console.log(users);
             });
 
 
@@ -183,11 +222,7 @@ var Watchlist   = require('./models/watchlist');
             });
         });
 
-        app.get('/api/items/:id', function(req, res, next) {
-
-            console.log(req);
-
-            
+        app.get('/api/items/user/:id', function(req, res, next) {
             // use mongoose to get item if one exists
             Item.find({ "sellerID": req.params.id }, function(err, data) {
                 if (err) return console.error(err);

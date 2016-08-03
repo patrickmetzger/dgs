@@ -30,12 +30,28 @@ angular.module('UserService', [
 angular.module('UserService')
     .factory('User', user);
 
-    function user($rootScope, $http, $cookies, $location, $route) {
+    function user($rootScope, $http, $cookies, $location, $route, $q) {
 
         var loginState = false;
 
         var userById = function(id){
-            return $http.get('/api/user/' + id);
+            return $http.get('/api/user/id/' + id).then(function(response) {    
+              return response.data;
+            });
+        };
+
+        var checkFollow = function(id){
+            var userData = returnUserID();
+            if (userData){
+                
+                return $http.get('/api/user/follow/' + userData.token + '/' + id).then(function(response){
+                    var followingData = response.data;
+                    return followingData;
+                });
+            }else{
+                return undefined;   
+            }
+            return checkFollow;
         };
 
         var checkBearerToken = function(ref, action){
@@ -58,14 +74,6 @@ angular.module('UserService')
                 var activeSession = $cookies.getObject("dgsUserAuth");
                 return $http.get('/api/user/' + activeSession.token);
             }
-        }
-
-        var userWishList = function(uID){
-            return $http.get('/api/wishlist' + uID);
-        }
-
-        var userWatchList = function(uID){
-            return $http.get('/api/watchlist' + uID);
         }
 
         var getUID = function(){
@@ -96,6 +104,22 @@ angular.module('UserService')
             $location.path('/login');
             $route.reload();
         };
+
+        var followUser = function(itemID, action){
+            var userData = returnUserID();
+            if (userData){
+                // add to users wishlist
+                var data = {
+                    'userID' : userData.token,
+                    'itemID' : itemID,
+                    'action' : action
+                };
+
+                $http.post('/api/user/follow', data).then(function(success){
+                    return success;
+                });
+            }
+        }
 
         return {
             getUserByID : function(id){
@@ -155,7 +179,16 @@ angular.module('UserService')
 
             getProfile: function(){
                 return activeUserProfile();
+            },
+
+            checkIfFollow: function(userID){
+                return checkFollow(userID);
+            },
+
+            follow: function(id, action){
+                return followUser(id, action);
             }
+            
         }       
 
     };
@@ -240,21 +273,33 @@ angular.module('UserService')
 	function items($http) {
 
 		var itemsByID = function(id){
-			return $http.get('/api/items/' + id);
+			return $http.get('/api/items/user/' + id);
 		};
 
 		var itemsByCat = function(catID){
 			return $http.get('/api/items/' + catID);
 		};
 
-		return {
+		var itemCountByID = function(id){
+			var items = $http.get('/api/items/user/' + id).then(function(response){
+				return response.data;
+			});
 			
+			return items;
+		};
+
+		return {
+
 			getItemsByCat : function(catID) {
 	            return itemsByCat(catID);
 	        },
 
 	        getItemsByID : function(id) {
 	            return itemsByID(id);
+	        },
+
+	        getItemCountByID : function(id) {
+	            return itemCountByID(id);
 	        }
 		}
 		

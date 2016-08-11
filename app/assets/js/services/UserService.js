@@ -1,20 +1,18 @@
 // public/js/services/UserService.js
-
 angular.module('UserService', [
     'ngCookies'
 ]);
 
+
 angular.module('UserService')
     .factory('User', user);
 
-    function user($rootScope, $http, $cookies, $location, $route, $q) {
-
+    function user($rootScope, $http, $cookies, $location, $route, $q, userRoles) {
+        
         var loginState = false;
 
         var userById = function(id){
-            return $http.get('/api/user/id/' + id).then(function(response) {    
-              return response.data;
-            });
+            return $http.get('/api/user/id/' + id);
         };
 
         var checkFollow = function(id){
@@ -31,8 +29,13 @@ angular.module('UserService')
             return checkFollow;
         };
 
+        var getBearToken = function(){
+            var beartoken = $cookies.get("token");
+            return beartoken;
+        };
+
         var checkBearerToken = function(ref, action){
-            var activeSession = $cookies.getObject("dgsUserAuth");
+            var activeSession = $cookies.get("token");
             if (activeSession){
                 loginState = true;
             }else{
@@ -47,16 +50,16 @@ angular.module('UserService')
         };
 
         var activeUserProfile = function(){
-            if (checkBearerToken()){
-                var activeSession = $cookies.getObject("dgsUserAuth");
-                return $http.get('/api/user/' + activeSession.token);
+            if (UserObject.email){
+                return buildUser();
+            }else{
+                return UserObject;
             }
-        }
+       }
 
         var getUID = function(){
-            var activeSession = $cookies.getObject("dgsUserAuth");
-            if (activeSession){
-                return activeSession.token;
+            if (checkBearerToken()){
+                return $http.get('/api/userid');
             }else{
                 return undefined;
             }
@@ -64,17 +67,14 @@ angular.module('UserService')
         }
 
         var returnUserID = function(){
-            //if (checkBearerToken()){
-                var activeSession = $cookies.getObject("dgsUserAuth");
-                return activeSession;
-            //}
+            
+            
         }
 
         var logout = function(){
-            if ($cookies.getObject("dgsUserAuth")){
-                $cookies.remove("dgsUserAuth");
-            }
-            
+
+            $cookies.remove("token");
+
             $rootScope.showMenu = false;
             $rootScope.$broadcast('loginStateChange');
 
@@ -96,9 +96,23 @@ angular.module('UserService')
                     return success;
                 });
             }
+        };
+
+        var buildUser = function(){
+            // check if user already exist
+            var userID = $http.get('/api/userid').then(function(response){
+                userById(response.data).then(function(userData){
+                    console.log(userData.data);
+                });
+            });
         }
 
         return {
+            createUser : function(){
+                console.log('creating user');
+                return buildUser();
+            },
+
             getUserByID : function(id){
                 return userById(id);
             },
@@ -109,6 +123,10 @@ angular.module('UserService')
 
             getUserId : function(){
                 return returnUserID();
+            },
+
+            getToken: function(){
+                return getBearToken();
             },
 
             checkAccessToken: function(ref, action){
@@ -140,7 +158,7 @@ angular.module('UserService')
             },
 
             checkLogin: function() {
-                if ($cookies.getObject("dgsUserAuth")){
+                if ($cookies.get("token")){
                     loginState = true;
                 }else{
                     loginState = false;

@@ -1,4 +1,4 @@
-angular.module('dgs').factory('AuthService',
+angular.module('dgs').factory('AuthServiceOLD',
   ['$q', '$timeout', '$http',
   function ($q, $timeout, $http) {
 

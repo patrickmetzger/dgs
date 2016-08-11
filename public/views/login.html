@@ -1,5 +1,9 @@
+
 <div class="col-md-6 col-md-offset-3">
 	<h1>Login</h1>
+
+	<!-- show any messages that come back with authentication -->
+    <div ng-if="message.length > 0" class="alert alert-danger">{{ message }}></div>
 
 	<form name="signIn" ng-controller="login" ng-submit="login(loginData)">
 		<div class="col-md-6 form-group" ng-class="{ 'has-error' : loginData.email.$invalid && !loginData.email.$pristine }">

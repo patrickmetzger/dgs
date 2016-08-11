@@ -26,12 +26,28 @@ angular.module('dgs', [
 	'dgs.sellerInfo',
 	'Item',
 	'ItemService',
-	'WishListService'
+	'WishListService',
+	'UtilService',
+	'dgs.authService'
 ]);
 
-angular.module('dgs').run(function ($rootScope, $location, $route, User, countItem) {
-  $rootScope.$on('$routeChangeStart',
-    function (event, next, current) {
+angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $route, User, countItem, Util, AuthService, authEvents) {
+	//$http.defaults.headers.common = 'application/json';
+	if ($cookies.get('token')) {
+		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
+	}
+
+  	$rootScope.$on('$routeChangeStart', function (event, next, current) {
+
+  		if ('data' in next && 'authorizedRoles' in next.data) {
+	      var authorizedRoles = next.data.authorizedRoles;
+	      if (!AuthService.isAuthorized(authorizedRoles)) {
+	        event.preventDefault();
+	        $location.url($location.current, {}, {reload: true});
+	        $rootScope.$broadcast(authEvents.notAuthorized);
+	      }
+	    }
+
     	if (next.params.hasOwnProperty('item')){
     		countItem.add(next.params.itemID);
     	}
@@ -56,7 +72,9 @@ angular.module('dgs').run(function ($rootScope, $location, $route, User, countIt
   });
 });
 // public/js/appRoutes.js
-angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+angular.module('appRoutes', ['UserService'])
+    .config(['$routeProvider','$httpProvider', '$locationProvider', 'UserProvider', 
+        function($routeProvider, $httpProvider, $locationProvider, UserProvider) {
 
     $routeProvider
 
@@ -104,6 +122,22 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
             templateUrl: 'views/admin/index.html',
             controller: 'AdminController',
             restricted: true
+        });
+
+        $httpProvider.interceptors.push(function($q){
+            return {
+                "request": function(config){
+                    var accessToken = UserProvider.$get().getToken();
+                    if (accessToken){
+                        config.headers.Authorization = "Bearer " + accessToken;
+                    }                   
+
+                    return config;    
+                },
+                "response": function(response){
+                    return response;
+                }
+            }
         });
 
     $locationProvider.html5Mode(true);

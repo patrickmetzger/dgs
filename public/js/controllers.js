@@ -1,32 +1,3 @@
-// public/js/controllers/AdminCtrl.js
-angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
-
-    $scope.tagline = 'Admin Home Page';   
-
-});
-// public/js/controllers/MainCtrl.js
-angular.module('MainCtrl', []).controller('MainController', function($scope) {
-
-    $scope.tagline = 'To the moon and back!'; 
-
-});
-// public/js/controllers/NerdCtrl.js
-angular.module('NerdCtrl', ['NerdService', 'UserService'])
-	.controller('NerdController', function($scope, Nerd, User) {
-
-		$scope.allNerds = Nerd.get().then(function(response){
-			var dataResponse = response.data;
-			$scope.nerds = dataResponse;
-		});
-
-		var allUsers = User.get().then(function(response){
-			var users = response.data;
-			$scope.users = users;
-		});
-
-    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
-
-});
 (function () {
     'use strict';
 
@@ -37,7 +8,6 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 
         $scope.title = 'My Account';
 
-
     }
 
     
@@ -45,11 +15,17 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 })();
 
 
+// public/js/controllers/AdminCtrl.js
+angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
+
+    $scope.tagline = 'Admin Home Page';   
+
+});
 
 /*(function () {
     'use strict';*/
 
-    angular.module('Authentication', ['UserService']);
+    angular.module('Authentication', ['UserService', 'UtilService']);
 
     angular.module('Authentication').controller('checkSecurity', checkSecurity);
     function checkSecurity($scope, $location, User){
@@ -66,23 +42,28 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
         if($routeParams.ref){
             $scope.redirect = $routeParams.ref;
         };
+
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
+
 				// if we get a good response, redirect user to main account page where we can upsell them.
-				if (response.data.success){
+				if (response.data.token){
                     // save the user cookie
                     var sessionCookie = {};
-
-                    sessionCookie.token = response.data._id;
+                    sessionCookie.token = response.data.token;
 
                     var cookieDomain = "localhost";
                     var newDate = new Date();
                     var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
-                    $cookies.putObject('dgsUserAuth', sessionCookie, {
+
+                    $cookies.put('token', response.data.token, {
                       domain: cookieDomain,
                       expires: exp
                     });
-                    
+
+                    // now create the user in UserService
+                    User.createUser();
+                   
                     $rootScope.showMenu = true;
                     $rootScope.$broadcast('loginStateChange');
 
@@ -109,19 +90,13 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 
     angular.module('Browse').controller('browse', browse);
     function browse($scope, $http, $location, $rootScope, category, catList) {
-
-
     	catList.getActiveList().then(function(cats){
 			$scope.allCats = cats;
 		});
-
-
-
     }
 
     angular.module('Browse').controller('browseItems', browseitems);
     function browseitems($scope, $http, $location, $rootScope, category, catList, items, $routeParams) {
-
         category.getData($routeParams.catType).then(function(catData){
             if (catData.data && catData.data._id != ''){
                 var catID = catData.data._id;
@@ -199,6 +174,29 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 
 })();
 
+// public/js/controllers/MainCtrl.js
+angular.module('MainCtrl', []).controller('MainController', function($scope) {
+
+    $scope.tagline = 'To the moon and back!'; 
+
+});
+// public/js/controllers/NerdCtrl.js
+angular.module('NerdCtrl', ['NerdService', 'UserService'])
+	.controller('NerdController', function($scope, Nerd, User) {
+
+		$scope.allNerds = Nerd.get().then(function(response){
+			var dataResponse = response.data;
+			$scope.nerds = dataResponse;
+		});
+
+		var allUsers = User.get().then(function(response){
+			var users = response.data;
+			$scope.users = users;
+		});
+
+    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
+
+});
 // public/js/controllers/register.js
 (function () {
     'use strict';

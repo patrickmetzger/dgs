@@ -26,12 +26,28 @@ angular.module('dgs', [
 	'dgs.sellerInfo',
 	'Item',
 	'ItemService',
-	'WishListService'
+	'WishListService',
+	'UtilService',
+	'dgs.authService'
 ]);
 
-angular.module('dgs').run(function ($rootScope, $location, $route, User, countItem) {
-  $rootScope.$on('$routeChangeStart',
-    function (event, next, current) {
+angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $route, User, countItem, Util, AuthService, authEvents) {
+	//$http.defaults.headers.common = 'application/json';
+	if ($cookies.get('token')) {
+		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
+	}
+
+  	$rootScope.$on('$routeChangeStart', function (event, next, current) {
+
+  		if ('data' in next && 'authorizedRoles' in next.data) {
+	      var authorizedRoles = next.data.authorizedRoles;
+	      if (!AuthService.isAuthorized(authorizedRoles)) {
+	        event.preventDefault();
+	        $location.url($location.current, {}, {reload: true});
+	        $rootScope.$broadcast(authEvents.notAuthorized);
+	      }
+	    }
+
     	if (next.params.hasOwnProperty('item')){
     		countItem.add(next.params.itemID);
     	}

@@ -2,36 +2,41 @@
 
 // modules =================================================
 var express        	= require('express');
+var app            	= express();
+var port 			= process.env.PORT || 8080; // set our port
+var mongoose 		= require('mongoose');
 var passport 		= require('passport');
+var flash    		= require('connect-flash');
+var morgan       	= require('morgan');
+var cookieParser 	= require('cookie-parser');
 var bodyParser     	= require('body-parser');
+var session      	= require('express-session');
 var methodOverride 	= require('method-override');
-var Mongoose 		= require('mongoose');
 var config 			= require("./config.json");
 var unless 			= require('express-unless');
-var app            	= express();
+var crypto 			= require('crypto');
+var http 			= require('http');
 
 // configuration ===========================================
-    
+var configDB = require('./config/db');    
 // config files
-var db = require('./config/db');
-//var db = Mongoose.createConnection('mongodb://localhost:27017/dgs');
+mongoose.connect(configDB.url); // connect to our database
 
-// set our port
-var port = process.env.PORT || 8080; 
+require('./config/passport')(passport); // pass passport for configuration
 
-// connect to our mongoDB database 
-// (uncomment after you enter in your own credentials in config/db.js)
-Mongoose.connect(db.url); 
+// set up our express application
+app.use(morgan('dev')); // log every request to the console
+app.use(cookieParser()); // read cookies (needed for auth)
 
 // get all data/stuff of the body (POST) parameters
-// parse application/json 
-app.use(bodyParser.json()); 
+app.use(bodyParser.json({ type: 'application/json' }));// parse application/json
+app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded
 
-// parse application/vnd.api+json as json
-app.use(bodyParser.json({ type: 'application/vnd.api+json' })); 
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true })); 
+// required for passport
+app.use(session({ secret: 'testingthisout' })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash());
 
 // override with the X-HTTP-Method-Override header in the request. simulate DELETE/PUT
 app.use(methodOverride('X-HTTP-Method-Override')); 
@@ -39,12 +44,12 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 // set the static files location /public/img will be /img for users
 app.use(express.static(__dirname + '/public')); 
 
-// routes ==================================================
-require('./app/routes')(app); // configure our routes
-
 // start app ===============================================
 // startup our app at http://localhost:8080
 app.listen(port);               
+
+// routes ==================================================
+require('./app/routes')(app, passport); // configure our routes
 
 // shoutout to the user                     
 console.log('Magic happens on port ' + port);

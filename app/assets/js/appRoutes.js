@@ -1,5 +1,7 @@
 // public/js/appRoutes.js
-angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+angular.module('appRoutes', ['UserService'])
+    .config(['$routeProvider','$httpProvider', '$locationProvider', 'UserProvider', 
+        function($routeProvider, $httpProvider, $locationProvider, UserProvider) {
 
     $routeProvider
 
@@ -47,6 +49,22 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
             templateUrl: 'views/admin/index.html',
             controller: 'AdminController',
             restricted: true
+        });
+
+        $httpProvider.interceptors.push(function($q){
+            return {
+                "request": function(config){
+                    var accessToken = UserProvider.$get().getToken();
+                    if (accessToken){
+                        config.headers.Authorization = "Bearer " + accessToken;
+                    }                   
+
+                    return config;    
+                },
+                "response": function(response){
+                    return response;
+                }
+            }
         });
 
     $locationProvider.html5Mode(true);

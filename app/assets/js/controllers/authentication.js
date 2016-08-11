@@ -2,7 +2,7 @@
 /*(function () {
     'use strict';*/
 
-    angular.module('Authentication', ['UserService']);
+    angular.module('Authentication', ['UserService', 'UtilService']);
 
     angular.module('Authentication').controller('checkSecurity', checkSecurity);
     function checkSecurity($scope, $location, User){
@@ -19,23 +19,28 @@
         if($routeParams.ref){
             $scope.redirect = $routeParams.ref;
         };
+
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
+
 				// if we get a good response, redirect user to main account page where we can upsell them.
-				if (response.data.success){
+				if (response.data.token){
                     // save the user cookie
                     var sessionCookie = {};
-
-                    sessionCookie.token = response.data._id;
+                    sessionCookie.token = response.data.token;
 
                     var cookieDomain = "localhost";
                     var newDate = new Date();
                     var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
-                    $cookies.putObject('dgsUserAuth', sessionCookie, {
+
+                    $cookies.put('token', response.data.token, {
                       domain: cookieDomain,
                       expires: exp
                     });
-                    
+
+                    // now create the user in UserService
+                    User.createUser();
+                   
                     $rootScope.showMenu = true;
                     $rootScope.$broadcast('loginStateChange');
 

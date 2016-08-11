@@ -8,7 +8,6 @@
 
         $scope.title = 'My Account';
 
-
     }
 
     

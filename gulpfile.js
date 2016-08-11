@@ -30,6 +30,11 @@ gulp.task('js', function(){
 	.pipe(concat('directives.js'))
 	.pipe(gulp.dest('./public/js'))
 
+	// constants
+	gulp.src([config.jsDir + 'constants/*.js'])
+	.pipe(concat('constants.js'))
+	.pipe(gulp.dest('./public/js'))
+
 });
 
 

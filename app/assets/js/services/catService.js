@@ -15,7 +15,7 @@
 	        },
 
 	        getData : function(category) {
-	        	return $http.get('/api/cat/' + category);
+	        	return $http.get('/api/cats/' + category);
 	        }
 		}
 		

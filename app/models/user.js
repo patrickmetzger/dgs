@@ -5,11 +5,8 @@ var mongoose            = require('mongoose');
 var Schema              = mongoose.Schema;
 // set Promise provider to bluebird
 mongoose.Promise    = require('bluebird');
-
 var bcrypt              = require('bcryptjs');
 var SALT_WORK_FACTOR    = 10;
-
-
 
 const authTypes = ['github', 'twitter', 'facebook', 'google'];
 
@@ -43,7 +40,7 @@ var UserSchema = new Schema({
     lName : {type : String, default: '', required: false},
     fullName : {type : String, default: '', required: false},
     username : {type: String, default: '', require: false},
-    zipCode : {type : Number, default: '', required: false},
+    zipCode : {type : Number},
     url : {type : String, default: ''},
     imgThumb : {type : String, default: ''},
     imgFull : {type : String, default: ''},
@@ -54,7 +51,8 @@ var UserSchema = new Schema({
     facebook: {},
     twitter: {},
     google: {},
-    github: {}
+    github: {},
+    verified: {type: Boolean, default: 0}
 });
 
 /**
@@ -99,8 +97,6 @@ UserSchema
 UserSchema
   .path('password')
   .validate(function(password) {
-
-    console.log(password);
 
     if(authTypes.indexOf(this.provider) !== -1) {
       return true;

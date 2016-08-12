@@ -496,6 +496,7 @@ angular.module('UserService', [
 angular.module('UserService')
     .factory('User', user);
 
+    
     function user($rootScope, $http, $cookies, $location, $route, $q, userRoles) {
         
         var loginState = false;
@@ -588,17 +589,23 @@ angular.module('UserService')
         };
 
         var buildUser = function(){
-            // check if user already exist
-            var userID = $http.get('/api/userid').then(function(response){
+            // get user id to build user
+            var userID = $http.get('/api/userid');
+
+            var userData = userID.then(function(response){
                 userById(response.data).then(function(userData){
-                    console.log(userData.data);
+                    return userData.data;
                 });
             });
+
+
+            return userData;
+
         }
 
         return {
+
             createUser : function(){
-                console.log('creating user');
                 return buildUser();
             },
 
@@ -611,7 +618,7 @@ angular.module('UserService')
             },
 
             getUserId : function(){
-                return returnUserID();
+                return getUID();
             },
 
             getToken: function(){

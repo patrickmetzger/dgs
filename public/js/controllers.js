@@ -5,7 +5,7 @@
 
     angular.module('Account').controller('account', account);
     function account($scope, $http, $location, $rootScope, User, category, accountInfo) {
-
+		
         $scope.title = 'My Account';
 
     }
@@ -42,10 +42,9 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
         if($routeParams.ref){
             $scope.redirect = $routeParams.ref;
         };
-
+        
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
-
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data.token){
                     // save the user cookie
@@ -73,7 +72,10 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
                         $location.path('/myaccount');    
                     }
 				};
-			});
+			}, function(response){
+                // show unauthorized message
+                $scope.message = 'Something went wrong with your login. Please try again!';
+            });
         }
 
 
@@ -220,7 +222,7 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
         .module('Register')
         .controller('register', register);
 
-	function register($scope, User) {
+	function register($scope, User, $location, $route) {
 
 	    $scope.tagline = 'Sign In / Register';
 
@@ -240,7 +242,7 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 	    	User.create(postData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data._id.length){
-
+					$location.path('/register/registration-success');
 				};
 			});
 			

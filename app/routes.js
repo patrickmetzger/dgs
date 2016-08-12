@@ -12,10 +12,15 @@ var Watchlist   = require('./models/watchlist');
 var passport    = require('passport');
 var jwt         = require('jsonwebtoken');
 var compose     = require('composable-middleware');
+var busboy      = require('connect-busboy'); //middleware for form/file upload
+var path        = require('path');     //used for file path
+var fs          = require('fs-extra');       //File System - for file manipulation
 
-var auth        = require('../config/auth.service');
+//var auth        = require('./config/auth.service');
 //import * as auth from '../../auth/auth.service';
 
+// Requires controller
+//var UserController = require('../config/UserController');
     
 module.exports = function(app) {
 

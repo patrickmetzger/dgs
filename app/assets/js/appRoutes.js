@@ -40,6 +40,14 @@ angular.module('appRoutes', ['UserService'])
             templateUrl: 'views/register.html',
             restricted: false
         })
+        .when('/register/registration-success', {
+            templateUrl: 'views/registration/register-success.html',
+            restricted: false    
+        })
+        .when('/register/registration-verify/:token', {
+            templateUrl: 'views/registration/register-verify.html',
+            restricted: false    
+        })
         .when('/myaccount', {
             templateUrl: 'views/myaccount/index.html',
             controller: 'account',
@@ -49,6 +57,9 @@ angular.module('appRoutes', ['UserService'])
             templateUrl: 'views/admin/index.html',
             controller: 'AdminController',
             restricted: true
+        })
+        .otherwise({
+            redirectTo: '/'
         });
 
         $httpProvider.interceptors.push(function($q){

@@ -21,7 +21,7 @@
         .module('Register')
         .controller('register', register);
 
-	function register($scope, User) {
+	function register($scope, User, $location, $route) {
 
 	    $scope.tagline = 'Sign In / Register';
 
@@ -41,7 +41,7 @@
 	    	User.create(postData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data._id.length){
-
+					$location.path('/register/registration-success');
 				};
 			});
 			

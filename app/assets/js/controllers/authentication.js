@@ -19,10 +19,9 @@
         if($routeParams.ref){
             $scope.redirect = $routeParams.ref;
         };
-
+        
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
-
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data.token){
                     // save the user cookie
@@ -50,7 +49,10 @@
                         $location.path('/myaccount');    
                     }
 				};
-			});
+			}, function(response){
+                // show unauthorized message
+                $scope.message = 'Something went wrong with your login. Please try again!';
+            });
         }
 
 

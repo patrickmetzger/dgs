@@ -28,7 +28,9 @@ angular.module('dgs', [
 	'ItemService',
 	'WishListService',
 	'UtilService',
-	'dgs.authService'
+	'dgs.authService',
+	'ngFileUpload',
+	'ngImgCrop'
 ]);
 
 angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $route, User, countItem, Util, AuthService, authEvents) {
@@ -36,9 +38,9 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
 	if ($cookies.get('token')) {
 		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
 	}
-
+/*
   	$rootScope.$on('$routeChangeStart', function (event, next, current) {
-
+  		
   		if ('data' in next && 'authorizedRoles' in next.data) {
 	      var authorizedRoles = next.data.authorizedRoles;
 	      if (!AuthService.isAuthorized(authorizedRoles)) {
@@ -52,6 +54,7 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
     		countItem.add(next.params.itemID);
     	}
 
+
     	if (next.restricted && !User.checkLogin()){
     		$location.path('/login');
 			$route.reload();
@@ -59,7 +62,7 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
     		if (User.checkLogin()){
     			$rootScope.showMenu = true;
     		}
-    	}
+    	}*/
     	
     	/*
     	User.getUserStatus()
@@ -68,6 +71,6 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
 	          $location.path('/login');
 	          $route.reload();
 	        }
-	    });*/
-  });
+	    });
+  });*/
 });

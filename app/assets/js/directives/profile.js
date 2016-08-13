@@ -25,23 +25,31 @@
 
 				$scope.upload = function (dataUrl, name) {
 
-					console.log(name);
+					if (name){
+						Upload.upload({
+						  	url: '/api/uploads',
+				            data: {
+				                file: Upload.dataUrltoBlob(dataUrl, name)
+				            },
+						}).then(function (response) {
+				            $timeout(function () {
+				                $scope.result = response.data;
 
-			        Upload.upload({
-					  	url: '/api/uploads',
-			            data: {
-			                file: Upload.dataUrltoBlob(dataUrl, name)
-			            },
-					}).then(function (response) {
-			            $timeout(function () {
-			                $scope.result = response.data;
-			            });
-			        }, function (response) {
-			            if (response.status > 0) $scope.errorMsg = response.status 
-			                + ': ' + response.data;
-			        }, function (evt) {
-			            $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
-			        });
+				                // lets update the users information
+				                User.updateThumb(name);
+				            });
+				        }, function (response) {
+				            if (response.status > 0) $scope.errorMsg = response.status 
+				                + ': ' + response.data;
+				        }, function (evt) {
+				            $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
+				        });	
+					}else{
+						//no name
+						console.log('failed');
+					}
+
+			        
 			    }
 
 

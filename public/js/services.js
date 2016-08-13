@@ -601,10 +601,29 @@ angular.module('UserService')
 
             return userData;
 
+        };
+
+        updateImgThumb = function(name){
+            // get uid and update users data
+            return getUID().then(function (response) {
+                var usersData = {
+                    '_id': response.data,
+                    'imgThumb': name
+                }
+                
+                $http.post('/api/user', usersData);
+            });           
+        };
+
+        saveUser = function(data){
+            return $http.post('/api/user', data);
         }
 
-        return {
 
+        return {
+            updateThumb : function(name){
+                return updateImgThumb(name);
+            },
             createUser : function(){
                 return buildUser();
             },
@@ -641,7 +660,7 @@ angular.module('UserService')
             // these will work when more API routes are defined on the Node side of things
             // call to POST and create a new nerd
             create : function(usersData) {
-                return $http.post('/api/user', usersData);
+                return saveUser(usersData);
             },
 
             // call to DELETE a nerd

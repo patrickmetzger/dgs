@@ -54,6 +54,7 @@ module.exports = function(app) {
                   if (!user) {
                     return res.status(401).end();
                   }
+
                   req.user = user;
                   next();
                 })
@@ -73,9 +74,13 @@ module.exports = function(app) {
         }
         if(!user) {
           return res.status(404).json({message: 'Something went wrong, please try again.'});
+        }else{
+            if (!user.verified){
+                return res.status(404).end();
+            }else{
+                var token = signToken(user._id, user.role);
+            }
         }
-
-        var token = signToken(user._id, user.role);
         res.json({ token });
       })(req, res, next);
     });
@@ -135,24 +140,33 @@ module.exports = function(app) {
     });
 
     app.post('/api/user', function(req, res) {
-        var regPost;
-        regPost = new User({
-            fName : req.body.fName,
-            lName : req.body.lName,
-            fullName : req.body.fullName,
-            email : req.body.email,
-            zipCode : req.body.zipcode,
-            url : req.body.url,
-            imgThumb : req.body.imgThumb,
-            imgFull : req.body.imgFull,
-            password : req.body.password
-        });
-       
-        regPost.save(function(err, regPost){
-            if(err){ return next(err); }
+        if (req.body._id){ // were updating
+            User.findByIdAndUpdate(req.body._id, req.body, function(err, user) {
+              if (err) throw err;
 
-            res.json(regPost);
-        });
+              // we have the updated user returned to us
+              console.log(user);
+            });
+        }else{
+            var regPost;
+            regPost = new User({
+                fName : req.body.fName,
+                lName : req.body.lName,
+                fullName : req.body.fullName,
+                email : req.body.email,
+                zipCode : req.body.zipcode,
+                url : req.body.url,
+                imgThumb : req.body.imgThumb,
+                imgFull : req.body.imgFull,
+                password : req.body.password
+            });
+           
+            regPost.save(function(err, regPost){
+                if(err){ return next(err); }
+
+                res.json(regPost);
+            });
+        }
     });
 
     // update USER wishlist

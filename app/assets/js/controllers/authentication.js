@@ -19,7 +19,7 @@
         if($routeParams.ref){
             $scope.redirect = $routeParams.ref;
         };
-        
+
         $scope.login = function(loginData){
         	User.authenticate(loginData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
@@ -50,8 +50,14 @@
                     }
 				};
 			}, function(response){
-                // show unauthorized message
-                $scope.message = 'Something went wrong with your login. Please try again!';
+                if (response.status == '404'){
+                    // show unauthorized message
+                    $scope.message = 'Your account has not been verified yet.';
+                }else if (response.status == '401'){
+                    // show unauthorized message
+                    $scope.message = 'Something went wrong with your login. Please try again!';
+                }
+                
             });
         }
 

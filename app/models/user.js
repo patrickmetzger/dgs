@@ -52,6 +52,8 @@ var UserSchema = new Schema({
     twitter: {},
     google: {},
     github: {},
+    created_at: Date,
+    updated_at: Date,
     verified: {type: Boolean, default: 0}
 });
 
@@ -173,6 +175,17 @@ UserSchema
         return next();
       });
     });
+
+    // get update timestamp
+    var currentDate = new Date();
+    // change the updated_at field to current date
+    this.updated_at = currentDate;
+
+    // if created_at doesn't exist, add to that field
+    if (!this.created_at)
+      this.created_at = currentDate;
+      next();
+
   });
 
 /**

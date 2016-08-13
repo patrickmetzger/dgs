@@ -38,7 +38,7 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
 	if ($cookies.get('token')) {
 		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
 	}
-/*
+
   	$rootScope.$on('$routeChangeStart', function (event, next, current) {
   		
   		if ('data' in next && 'authorizedRoles' in next.data) {
@@ -62,15 +62,15 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $rou
     		if (User.checkLogin()){
     			$rootScope.showMenu = true;
     		}
-    	}*/
+    	}
     	
-    	/*
-    	User.getUserStatus()
+
+    	/*User.getUserStatus()
 	      .then(function(){
 	        if (next.restricted && !User.checkLogin()){
 	          $location.path('/login');
 	          $route.reload();
 	        }
-	    });
-  });*/
+	    });*/
+  });
 });

@@ -78,7 +78,6 @@
             logout: logout,
             isAuthorized: isAuthorized,
             isAuthenticated: function() {
-              console.log('is authenticated');
               return isAuthenticated;
             },
             username: function() {

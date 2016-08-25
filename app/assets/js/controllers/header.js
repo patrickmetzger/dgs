@@ -6,8 +6,8 @@
     angular
         .module('Header')
         .controller('header', header);
-    function header($scope, $rootScope, $location, $routeParams, User, catList, $route) {
-		$scope.route = $route;
+    function header($scope, $rootScope, $location, $stateParams, User, catList, $state) {
+		$scope.state = $state;
         
         $scope.isLoggedIn = User.checkLogin();
         $scope.menuLogoutClick = User.doLogout($scope);

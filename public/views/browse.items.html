@@ -29,7 +29,11 @@
 			</div>
 
 			<div class="col-md-8">
-				<div class="item-name"><a href="/item/{{ item.shortName }}/{{ item._id }}">{{ item.name }}</a></div>
+				<div class="item-name">
+					<a ui-sref="item({item: item.shortName, itemID: item._id})">
+						{{ item.name }}
+					</a>
+				</div>
 				<div class="item-price">{{ item.price | currency }}</div>
 				<div class="item-date"><strong>Added:</strong> {{ item.insertDate | date:'MM/dd/yyyy' }}</div>
 				<!--<div class="item-desc" ng-bind-html="item.description"></div>-->

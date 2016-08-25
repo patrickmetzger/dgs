@@ -3,7 +3,7 @@ var path = require('path');
 UserController = function() {};
 
 UserController.prototype.uploadFile = function(req, res) {
-    var uploadDir = path.join('/public/imgs/uploads');
+    var uploadDir = path.join('../' + __dirname, '/uploads');
     console.log(req.files);
     console.log(uploadDir);
     /*

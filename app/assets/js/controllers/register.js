@@ -8,22 +8,33 @@
         .module('Register')
         .controller('tab', tab);
 
-	function tab($scope, $routeParams) {
+	function tab($scope, $stateParams) {
 		$scope.selectedIndex = 0;
-		if ($routeParams.register){
+		if ($stateParams.register){
 			$scope.selectedIndex = 1;
 		};
 		
 		return $scope.selectedIndex;
 	};
 
+	angular
+        .module('Register')
+        .controller('registerVerify', verify);
+
+	function verify($scope, User, $location, $state) {
+		console.log('ljkjlj');
+	}
+
     angular
         .module('Register')
         .controller('register', register);
 
-	function register($scope, User, $location, $route) {
-
+	function register($scope, User, $location, $state) {
 	    $scope.tagline = 'Sign In / Register';
+
+	    $scope.credentials = {
+          password: ''
+        };
 
 	    $scope.register = function(formData){
 	    	var postData = {};
@@ -41,7 +52,9 @@
 	    	User.create(postData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data._id.length){
-					$location.path('/register/registration-success');
+					// send welcome email
+					User.sendWelcomeMail(response.data);
+					$state.go('register_success');
 				};
 			});
 			

@@ -36,11 +36,10 @@
 		}
 		
 		var inWishList = function(itemID){
-            var userData = User.getUserId();
             var inWL = false;
 
-            if (userData){
-            	var userID = userData.token;
+            if (User.checkLogin()){
+            	var userID = User.getUserId();
             	return $http.get('/api/user/wishlist/' + userID + '/' + itemID);
             }else{
             	return undefined;

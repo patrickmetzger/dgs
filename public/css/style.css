@@ -108,3 +108,40 @@ form .progress {
   font-size: smaller;
   background: orange;
   width: 0; }
+
+/*################### PROFILE ############## */
+#profile {
+  color: #3F3F3D; }
+  #profile h1 {
+    color: #7C7C7C;
+    font-size: 18px; }
+  #profile .thumb_outer {
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative; }
+  #profile .col-outer {
+    border: 1px solid #eeeeee;
+    border-radius: 5px;
+    padding: 50px; }
+  #profile .fullName {
+    font-size: 16px;
+    font-weight: bold; }
+  #profile label {
+    margin-top: 8px; }
+  #profile input {
+    border-radius: 10px; }
+  #profile .user_profile_pic {
+    position: relative; }
+  #profile .user_profile_upload {
+    bottom: 0;
+    left: 30px;
+    overflow: hidden;
+    width: 160px;
+    position: absolute;
+    background: black;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: opacity .13s ease-out; }

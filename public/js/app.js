@@ -1,9 +1,12 @@
 // public/js/app.js
 angular.module('dgs', [
+	'Main',
+	'ui.router',
 	'ngRoute', 
 	'appRoutes', 
 	'ngCookies',
 	'ngSanitize',
+	'AuthSecurity',
 	'ValidationDirectives',
 	'MainCtrl', 
 	'UserService', 
@@ -18,7 +21,8 @@ angular.module('dgs', [
 	'Header',
 	'Search',
 	'Browse',
-	'Authentication',
+	'AuthControllers',
+	'dgs.loginFrm',
 	'dgs.profile',
 	'dgs.watchlist',
 	'dgs.searchform',
@@ -30,63 +34,135 @@ angular.module('dgs', [
 	'UtilService',
 	'dgs.authService',
 	'ngFileUpload',
-	'ngImgCrop'
-]);
+	'ngImgCrop',
+	'EmailService',
+	'ui.bootstrap',
+	'ui.router.modal',
+	'Profile'
+	]);
 
-angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $route, User, countItem, Util, AuthService, authEvents) {
+angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $state, User, countItem, Util, AuthService, authEvents, userRoles) {
 	//$http.defaults.headers.common = 'application/json';
 	if ($cookies.get('token')) {
 		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
 	}
+	$rootScope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+		if (User.getToken()){
+			User.getUserId().then(function(response){
+				User.getUserByID(response.data).then(function(response){
+					var role = response.data.role;
+					$rootScope.$broadcast(userRoles.role);
+				})
+			});
+		}
 
-  	$rootScope.$on('$routeChangeStart', function (event, next, current) {
-  		
-  		if ('data' in next && 'authorizedRoles' in next.data) {
-	      var authorizedRoles = next.data.authorizedRoles;
-	      if (!AuthService.isAuthorized(authorizedRoles)) {
-	        event.preventDefault();
-	        $location.url($location.current, {}, {reload: true});
-	        $rootScope.$broadcast(authEvents.notAuthorized);
-	      }
-	    }
+		if ('data' in toState && 'authorizedRoles' in toState.data) {
+			var authorizedRoles = toState.data.authorizedRoles;
+			if (!AuthService.isAuthorized(authorizedRoles)) {
+				e.preventDefault();
+				$location.url($location.current, {}, {reload: true});
+				$rootScope.$broadcast(authEvents.notAuthorized);
+			}
+		}
 
-    	if (next.params.hasOwnProperty('item')){
-    		countItem.add(next.params.itemID);
+		if (toParams.hasOwnProperty('item')){
+    		countItem.add(toParams.itemID);
     	}
 
-
-    	if (next.restricted && !User.checkLogin()){
-    		$location.path('/login');
-			$route.reload();
+    	if (toState.restricted && !User.checkLogin()){
+    		$state.go('login', {refresh: true});
     	}else{
     		if (User.checkLogin()){
     			$rootScope.showMenu = true;
     		}
     	}
-    	
 
-    	/*User.getUserStatus()
-	      .then(function(){
-	        if (next.restricted && !User.checkLogin()){
-	          $location.path('/login');
-	          $route.reload();
-	        }
-	    });*/
-  });
+    	console.log($rootScope);
+	});
 });
 // public/js/appRoutes.js
-angular.module('appRoutes', ['UserService'])
-    .config(['$routeProvider','$httpProvider', '$locationProvider', 'UserProvider', 
-        function($routeProvider, $httpProvider, $locationProvider, UserProvider) {
+angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
+    .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$locationProvider', 'UserProvider', 
+        function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, UserProvider) {
 
+            $urlRouterProvider.otherwise("/");
+            $stateProvider
+                .state('home', {
+                    url: "/",
+                    controller: 'MainController',
+                    restricted: false,
+                    templateUrl: "views/home.html"
+                })
+                .state('search_category', {
+                    url: "/search:category",
+                    templateUrl: "views/search/search.view.html",
+                    restricted: false,
+                    controller: "search"
+                })
+                .state('browse', {
+                    url: "/browse-items",
+                    templateUrl: "views/browse.view.html",
+                    restricted: false,
+                    controller: "browse"
+                })
+                .state('browse_category', {
+                    url: "/browse-items/:catType",
+                    templateUrl: "views/browse.items.html",
+                    restricted: false,
+                    controller: "browseItems"
+                })
+                .state('item', {
+                    url: "/item/:item/:itemID",
+                    templateUrl: "views/item.view.html",
+                    restricted: false,
+                    controller: "item",
+                    params: {
+                        item: null,
+                        itemID: null,
+                        action: null
+                    },
+                })
+                .state('login', {
+                    url: "/login",
+                    templateUrl: "views/login.html",
+                    restricted: false,
+                    params: {
+                        state: null,
+                        item: null,
+                        itemID: null,
+                        action: null,
+                    },
+                })
+                .state('register', {
+                    url: "/register",
+                    templateUrl: "views/register.html",
+                    restricted: false
+                })
+                .state('register_success', {
+                    url: "/register/registration-success",
+                    templateUrl: "views/registration/register-success.html",
+                    restricted: false
+                })
+                .state('verify_success', {
+                    url: "/verify-success",
+                    templateUrl: "views/registration/verify-success.html",
+                    restricted: false
+                })
+                .state('myaccount', {
+                    url: "/myaccount",
+                    templateUrl: "views/myaccount/index.html",
+                    restricted: true,
+                    controller: 'account'
+                })
+                .state('admin', {
+                    url: "/admin",
+                    templateUrl: "views/admin/index.html",
+                    restricted: true
+                })
+
+    /*
     $routeProvider
 
-        // home page
-        .when('/', {
-            templateUrl: 'views/home.html',
-            controller: 'MainController',
-            restricted: false
-        })
         // nerds page that will use the NerdController
         .when("/search:category", {
             controller: "search",
@@ -108,21 +184,18 @@ angular.module('appRoutes', ['UserService'])
             controller: "item",
             restricted: false
         })
-        .when('/login', {
-            templateUrl: 'views/login.html',
-            restricted: false
-        })
-        .when('/register', {
-            templateUrl: 'views/register.html',
-            restricted: false
-        })
         .when('/register/registration-success', {
             templateUrl: 'views/registration/register-success.html',
             restricted: false    
         })
         .when('/register/registration-verify/:token', {
             templateUrl: 'views/registration/register-verify.html',
-            restricted: false    
+            controller: 'registerVerify',
+            restricted: false
+        })
+        .when('/verify-success', {
+            templateUrl: 'views/registration/verify-success.html',
+            restricted: false
         })
         .when('/myaccount', {
             templateUrl: 'views/myaccount/index.html',
@@ -136,7 +209,7 @@ angular.module('appRoutes', ['UserService'])
         })
         .otherwise({
             redirectTo: '/'
-        });
+        });*/
 
         $httpProvider.interceptors.push(function($q){
             return {

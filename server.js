@@ -16,9 +16,12 @@ var config 			= require("./config.json");
 var unless 			= require('express-unless');
 var crypto 			= require('crypto');
 var http 			= require('http');
-var busboy      = require('connect-busboy'); //middleware for form/file upload
-var path        = require('path');     //used for file path
-var fs          = require('fs-extra');       //File System - for file manipulation
+var busboy      	= require('connect-busboy'); //middleware for form/file upload
+var path        	= require('path');     //used for file path
+var fs          	= require('fs-extra');       //File System - for file manipulation
+var nodemailer 		= require('nodemailer');
+var smtpTransport 	= nodemailer.createTransport('smtps://pjmetzger76%40gmail.com:reg2temPJ@smtp.gmail.com');
+var User        	= require('./app/models/user');
 
 // configuration ===========================================
 var configDB = require('./config/db');    
@@ -48,6 +51,42 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(busboy());
 app.use(express.static(path.join('../' + __dirname, 'public')));
+
+app.post('/sendemail',function(req,res){
+	var mailOptions = {
+	   	to : req.body.to,
+		subject : req.body.subject,
+	   	html : req.body.html,
+	   	text: req.body.text // plaintext body
+    }
+
+	smtpTransport.sendMail(mailOptions, function(error, response){
+	if(error){
+	console.log(error);
+	res.end("error");
+	}else{
+	console.log("Message sent: " + response.message);
+	res.end("sent");
+	}
+	});
+});
+
+app.get("/verify/:token", function (req, res, next) {
+    var token = req.params.token;
+
+    User.findOne({salt: token}, function (err, doc){
+        if (err) return done(err);
+
+        var id = doc._id;
+        var updateObj = {verified: true};
+        User.findByIdAndUpdate(doc._id, updateObj, function(err, user) {
+			if (err) throw err;
+			// lets redirect now that we've verified user
+			res.redirect('/verify-success');
+        });
+
+    })
+});
 
 app.route('/api/uploads')
 	.post(function (req, res, next) {

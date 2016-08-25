@@ -1,7 +1,7 @@
 (function() {
 	'use strict';
 
-	angular.module('dgs.addToButtons', ['ItemService', 'Authentication', 'UserService', 'WishListService']);
+	angular.module('dgs.addToButtons', ['ItemService', 'AuthControllers', 'UserService', 'WishListService']);
 
 	angular.module('dgs.addToButtons')
 		.directive("addToButtons", addToButtons);
@@ -9,12 +9,12 @@
 	function addToButtons(item, User, wList){
 		return {
 			restrict: 'AE',
-			controller: function($scope, $element, $attrs, $location, $routeParams) {
+			controller: function($scope, $element, $attrs, $location, $state, $stateParams) {
 				$scope.action = 'add';
 				$scope.wishListText = 'Add to Wish List';
 				$scope.defaultBtnClass = 'btn-warning';
 				$scope.action = 'add';
-				var itemID = $routeParams.itemID;
+				var itemID = $stateParams.itemID;
 
 				function checkList(itemID){
 					if (wList.checkWishList(itemID)){
@@ -37,13 +37,13 @@
 							$scope.action = 'add';
 						});
 
-
+						
 					}
-					 return $scope.action;
+					return $scope.action;
 				}
 
 				// if we have been redirected with an action to add item to wishlist
-				if ($routeParams.ActionAddTolist){
+				if ($stateParams.action){
 					if (checkList(itemID) == 'add'){
 						wList.adding(itemID, 'add');
 					}
@@ -65,9 +65,9 @@
 						
 					}else{
 						if (action == 'add'){
-							User.checkAccessToken($location.path(), 'ActionAddTolist');
+							User.checkAccessToken($state.current.name, $stateParams, 'ActionAddTolist');
 						}else if (action == 'delete'){
-							User.checkAccessToken($location.path(), 'ActionrRemoveFromlist');
+							User.checkAccessToken($state.current.name, $stateParams, 'ActionRemoveFromlist');
 						}
 
 						

@@ -1,31 +1,25 @@
 <div>My Account</div>
-
-
-{{ usrData }}
 <div ng-cloak>
   <md-content>
     <md-tabs md-dynamic-height md-border-bottom>
-      <md-tab label="Profile">
+      <md-tab label="Profile" md-on-select="onTabChanges(0)">
         <md-content class="md-padding">
-
-          <h1 class="md-display-2">Profile</h1>
           <user-profile></user-profile>
-
         </md-content>
       </md-tab>
 
-      <md-tab label="Items For Sale">
+      <md-tab label="Items I'm Selling" md-on-select="onTabChanges(1)">
         <md-content class="md-padding">
-          <h1 class="md-display-2">Items For Sale</h1>
-          asdfsadfdsfdsaf
+          <h1 class="md-display-2">Items I'm Selling</h1>
+          <button>Sell an Item</button>
         </md-content>
       </md-tab>
       
-      <md-tab label="Watchlist">
+      <md-tab label="Watchlist" md-on-select="onTabChanges(2)">
         <md-content class="md-padding">
 
           <h1 class="md-display-2">Watchlist</h1>
-          <watch-list></watch-list>
+          <!--<watch-list></watch-list>-->
           
         </md-content>
       </md-tab>

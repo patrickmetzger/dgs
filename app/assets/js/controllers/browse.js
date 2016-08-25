@@ -11,8 +11,8 @@
     }
 
     angular.module('Browse').controller('browseItems', browseitems);
-    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $routeParams) {
-        category.getData($routeParams.catType).then(function(catData){
+    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $stateParams) {
+        category.getData($stateParams.catType).then(function(catData){
             if (catData.data && catData.data._id != ''){
                 var catID = catData.data._id;
                 $scope.catName = catData.data.name;
@@ -29,8 +29,8 @@
         $scope.filters = {};
         $scope.sort = 'price';
 
-        $scope.category = $routeParams.category;
-        $scope.keyword = $routeParams.keyword;
+        $scope.category = $stateParams.category;
+        $scope.keyword = $stateParams.keyword;
         if ($scope.keyword != ''){
             $scope.filters["name"] = $scope.keyword;
         }

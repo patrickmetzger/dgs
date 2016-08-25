@@ -1,5 +1,5 @@
 
-<div class="col-md-6 col-md-offset-3">
+<div class="col-md-8 col-md-offset-1">
 	<h1>{{ tagline }}</h1>
 
 	<form name="regForm" ng-controller="register" ng-submit="register(formData)">
@@ -46,11 +46,15 @@
 	        <span ng-show="regForm.emailConfirm.$touched && regForm.emailConfirm.$invalid && regForm.emailConfirm.$error.mismatch" class="text-danger">Please confirm your email address!</span>
 	    </div>
 	    <div class="col-md-12 form-group" ng-class="{ 'has-error' : regForm.password.$invalid && !regForm.password.$pristine }">
-	        <input type="text" class="form-control" id="password" name="password" placeholder="Password" ng-model="formData.password" required="true">
-	        <span ng-show="regForm.password.$invalid && !regForm.password.$pristine" class="text-danger">Password is required!</span>
+		   	<input type="password" name="password" id="password" ng-model="formData.password" ng-model-options="{allowInvalid: true}" pattern-validator="((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,8})" class="form-control" required="true" placeholder="Password" />
+		    <span ng-show="regForm.password.$error.passwordPattern" class="text-danger">The password does not meet requirements!</span>
+		    <div>
+		    	<p>Min length 8, a special character, a digit, and at least one capital letter</p>
+		    </div>
 	    </div>
-	    <div class="col-md-12 form-group" ng-class="{ 'has-error' : regForm.zipcode.$invalid && !regForm.zipcode.$pristine }">
-	        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Zip Code" ng-model="formData.zipcode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/">
+
+	    <div class="col-md-4 form-group" ng-class="{ 'has-error' : regForm.zipcode.$invalid && !regForm.zipcode.$pristine }">
+	        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Zip Code" ng-model="formData.zipcode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/" size="10">
 	        <span ng-show="regForm.zipcode.$invalid && !regForm.zipcode.$pristine" class="text-danger">Valide zip code is required!</span>
 	    </div>
 	    <div class="col-md-12">

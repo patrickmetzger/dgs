@@ -21,76 +21,74 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     $scope.tagline = 'Admin Home Page';   
 
 });
+angular.module('AuthControllers', ['UserService', 'UtilService']);
 
-/*(function () {
-    'use strict';*/
+angular.module('AuthControllers').controller('checkSecurity', security);
+function security($scope, $location, User){
+    if (!User.checkAccessToken()){
+        user.noAccess();    
+    }
+};
 
-    angular.module('Authentication', ['UserService', 'UtilService']);
-
-    angular.module('Authentication').controller('checkSecurity', checkSecurity);
-    function checkSecurity($scope, $location, User){
-        
-        if (!User.checkAccessToken()){
-            user.noAccess();    
-         }
+angular.module('AuthControllers').controller('login', login);
+function login($scope, $rootScope, User, $location, $state, $stateParams, $cookies) {
+    // is there a redirect?
+    var redirect = false;
+    if($stateParams.action){
+        redirect = true;
     };
 
-    angular.module('Authentication').controller('login', login);
-    function login($scope, $rootScope, User, $location, $route, $routeParams, $cookies) {
-        // is there a redirect?
-        $scope.redirect = '';
-        if($routeParams.ref){
-            $scope.redirect = $routeParams.ref;
-        };
+    $scope.login = function(loginData){
+    	User.authenticate(loginData).then(function(response){
+			// if we get a good response, redirect user to main account page where we can upsell them.
+			if (response.data.token){
+                // save the user cookie
+                var sessionCookie = {};
+                sessionCookie.token = response.data.token;
 
-        $scope.login = function(loginData){
-        	User.authenticate(loginData).then(function(response){
-				// if we get a good response, redirect user to main account page where we can upsell them.
-				if (response.data.token){
-                    // save the user cookie
-                    var sessionCookie = {};
-                    sessionCookie.token = response.data.token;
+                var cookieDomain = "localhost";
+                var newDate = new Date();
+                var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
 
-                    var cookieDomain = "localhost";
-                    var newDate = new Date();
-                    var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
+                $cookies.put('token', response.data.token, {
+                  domain: cookieDomain,
+                  expires: exp
+                });
 
-                    $cookies.put('token', response.data.token, {
-                      domain: cookieDomain,
-                      expires: exp
-                    });
-
-                    // now create the user in UserService
-                    User.createUser();
-                   
-                    $rootScope.showMenu = true;
-                    $rootScope.$broadcast('loginStateChange');
-
-                    if ($scope.redirect != ''){
-                        $location.path($scope.redirect).search($routeParams.action);
-                    }else{
-                        $location.path('/myaccount');    
-                    }
-				};
-			}, function(response){
-                if (response.status == '404'){
-                    // show unauthorized message
-                    $scope.message = 'Your account has not been verified yet.';
-                }else if (response.status == '401'){
-                    // show unauthorized message
-                    $scope.message = 'Something went wrong with your login. Please try again!';
+                // now create the user in UserService
+                User.createUser();
+               
+                $rootScope.showMenu = true;
+                $rootScope.$broadcast('loginStateChange');
+                if (redirect){
+                    $state.go($stateParams.state, ({item: $stateParams.item, itemID: $stateParams.itemID, action: $stateParams.action,}));
+                }else{
+                    $state.go('myaccount');    
                 }
-                
-            });
-        }
-
-
-
+			};
+		}, function(response){
+            if (response.status == '404'){
+                // show unauthorized message
+                $scope.message = 'Your account has not been verified yet.';
+            }else if (response.status == '401'){
+                // show unauthorized message
+                $scope.message = 'Something went wrong with your login. Please try again!';
+            }
+            
+        });
     }
 
-    
-/*
-})();*/
+
+
+}
+var authSecurity = angular.module('AuthSecurity', ['UserService']);
+
+var checkSecurity = function($location, User, $rootScope, $window){
+	if(!User.checkAccessToken()){
+		User.noAccess();
+	};
+};
+
 (function () {
     'use strict';
 
@@ -104,8 +102,8 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     }
 
     angular.module('Browse').controller('browseItems', browseitems);
-    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $routeParams) {
-        category.getData($routeParams.catType).then(function(catData){
+    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $stateParams) {
+        category.getData($stateParams.catType).then(function(catData){
             if (catData.data && catData.data._id != ''){
                 var catID = catData.data._id;
                 $scope.catName = catData.data.name;
@@ -122,8 +120,8 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
         $scope.filters = {};
         $scope.sort = 'price';
 
-        $scope.category = $routeParams.category;
-        $scope.keyword = $routeParams.keyword;
+        $scope.category = $stateParams.category;
+        $scope.keyword = $stateParams.keyword;
         if ($scope.keyword != ''){
             $scope.filters["name"] = $scope.keyword;
         }
@@ -143,8 +141,8 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     angular
         .module('Header')
         .controller('header', header);
-    function header($scope, $rootScope, $location, $routeParams, User, catList, $route) {
-		$scope.route = $route;
+    function header($scope, $rootScope, $location, $stateParams, User, catList, $state) {
+		$scope.state = $state;
         
         $scope.isLoggedIn = User.checkLogin();
         $scope.menuLogoutClick = User.doLogout($scope);
@@ -165,10 +163,10 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     angular.module('Item', ['SearchService', 'CatService', 'ItemService', 'UserService']);
 
     angular.module('Item').controller('item', item);
-    function item($scope, $http, $location, $rootScope, $routeParams, searching, category, User, item, items) {
+    function item($scope, $http, $location, $rootScope, $stateParams, searching, category, User, item, items) {
 
         // get Item data
-    	item.getItemByID($routeParams.itemID).then(function(response){
+    	item.getItemByID($stateParams.itemID).then(function(response){
             $scope.itemData = response.data;
             $scope.status = response.status;
 
@@ -181,6 +179,27 @@ angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
     }   
 
 })();
+
+(function () {
+    'use strict';
+
+    angular.module('Main', ['UserService']);
+
+    angular.module('Main').controller('main', main);
+    function main($scope, $http, $location, $state, $stateParams, $rootScope, User) {
+		$scope.$watch(User.checkLogin, function (value, oldValue) {
+		    if(!value && oldValue) {
+		      console.log("Disconnect");
+		      $state.go('login');
+		    }
+		}, true);
+
+    }
+
+    
+
+})();
+
 
 // public/js/controllers/MainCtrl.js
 angular.module('MainCtrl', []).controller('MainController', function($scope) {
@@ -205,6 +224,146 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
     $scope.tagline = 'Nothing beats a pocket protector!!!!!';
 
 });
+(function () {
+    'use strict';
+
+    angular.module('Profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap']);
+
+    angular.module('Profile').controller('ProfileCtrl', profile);
+    function profile($scope, $http, $location, $rootScope, $uibModal, $log, Upload, User) {
+		checkSecurity($location, User);
+
+		$scope.onTabChanges = function(currentTabIndex){
+			checkSecurity($location, User);
+		};
+
+        var $ctrl = this;
+
+        if (User.checkLogin()){
+        	$scope.profileData = User.buildProfile().then(function(response){
+	        	$scope.profile = response;
+	        });
+        }
+        
+
+		$ctrl.animationsEnabled = true;
+		$scope.open = function () {
+			if (User.checkLogin()){
+				var modalInstance = $uibModal.open({
+				  animation: $ctrl.animationsEnabled,
+				  ariaLabelledBy: 'modal-title',
+				  ariaDescribedBy: 'modal-body',
+				  templateUrl: 'myModalContent.html',
+				  controller: 'ModalInstanceCtrl',
+				  controllerAs: '$ctrl',
+				  resolve: {
+				    items: function () {
+				      return $ctrl.items;
+				    }
+				  }
+				});
+
+				modalInstance.result.then(function (selectedItem) {
+				  $ctrl.selected = selectedItem;
+				}, function () {
+				  $log.info('Modal dismissed at: ' + new Date());
+				});
+			}else{
+				$state.go('login');
+			}
+			
+		};
+
+		$ctrl.openComponentModal = function () {
+		var modalInstance = $uibModal.open({
+		  animation: $ctrl.animationsEnabled,
+		  component: 'modalComponent',
+		  resolve: {
+		    items: function () {
+		      return $ctrl.items;
+		    }
+		  }
+		});
+
+		modalInstance.result.then(function (selectedItem) {
+		  $ctrl.selected = selectedItem;
+		}, function () {
+		  $log.info('modal-component dismissed at: ' + new Date());
+		});
+		};
+
+		$ctrl.toggleAnimation = function () {
+		$ctrl.animationsEnabled = !$ctrl.animationsEnabled;
+		};
+    }
+
+    
+
+    angular.module('Profile').controller('ModalInstanceCtrl', function (User, $uibModalInstance, $scope, Upload, $timeout) {
+	  	var $ctrl = this;
+	  	
+		$scope.upload = function (dataUrl, name) {
+			if (name){
+				Upload.upload({
+				  	url: '/api/uploads',
+			        data: {
+			            file: Upload.dataUrltoBlob(dataUrl, name)
+			        },
+				}).then(function (response) {
+			        $timeout(function () {
+			            $scope.result = response.data;
+
+			            // lets update the users information
+			            User.updateThumb(name);
+			            // now close the modal box
+			            $uibModalInstance.close();
+			            
+			            location.reload();
+			        });
+			    }, function (response) {
+			        if (response.status > 0) $scope.errorMsg = response.status 
+			            + ': ' + response.data;
+			    }, function (evt) {
+			        $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
+			    });	
+			}else{
+				//no name
+				console.log('failed');
+			}
+		} 
+	});
+
+	// Please note that the close and dismiss bindings are from $uibModalInstance.
+
+	angular.module('Profile').component('modalComponent', {
+	  templateUrl: 'myModalContent.html',
+	  bindings: {
+	    resolve: '<',
+	    close: '&',
+	    dismiss: '&'
+	  },
+	  controller: function () {
+	    var $ctrl = this;
+
+	    $ctrl.$onInit = function () {
+	      $ctrl.items = $ctrl.resolve.items;
+	      $ctrl.selected = {
+	        item: $ctrl.items[0]
+	      };
+	    };
+
+	    $ctrl.ok = function () {
+	      $ctrl.close({$value: $ctrl.selected.item});
+	    };
+
+	    $ctrl.cancel = function () {
+	      $ctrl.dismiss({$value: 'cancel'});
+	    };
+	  }
+	});
+
+
+})();
 // public/js/controllers/register.js
 (function () {
     'use strict';
@@ -215,22 +374,33 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
         .module('Register')
         .controller('tab', tab);
 
-	function tab($scope, $routeParams) {
+	function tab($scope, $stateParams) {
 		$scope.selectedIndex = 0;
-		if ($routeParams.register){
+		if ($stateParams.register){
 			$scope.selectedIndex = 1;
 		};
 		
 		return $scope.selectedIndex;
 	};
 
+	angular
+        .module('Register')
+        .controller('registerVerify', verify);
+
+	function verify($scope, User, $location, $state) {
+		console.log('ljkjlj');
+	}
+
     angular
         .module('Register')
         .controller('register', register);
 
-	function register($scope, User, $location, $route) {
-
+	function register($scope, User, $location, $state) {
 	    $scope.tagline = 'Sign In / Register';
+
+	    $scope.credentials = {
+          password: ''
+        };
 
 	    $scope.register = function(formData){
 	    	var postData = {};
@@ -248,7 +418,9 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 	    	User.create(postData).then(function(response){
 				// if we get a good response, redirect user to main account page where we can upsell them.
 				if (response.data._id.length){
-					$location.path('/register/registration-success');
+					// send welcome email
+					User.sendWelcomeMail(response.data);
+					$state.go('register_success');
 				};
 			});
 			
@@ -316,5 +488,113 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 	function tab($scope, User) {
 
 	};
+
+})();
+(function () {
+    'use strict';
+
+    angular.module('TestCtrl', ['ui.bootstrap']);
+
+    angular.module('TestCtrl').controller('TestController', test);
+    function test($scope, $http, $location, $rootScope, $uibModal, $log) {
+		
+        var $ctrl = this;
+		$ctrl.items = ['item1', 'item2', 'item3'];
+
+		$ctrl.animationsEnabled = true;
+
+		$ctrl.open = function (size) {
+		var modalInstance = $uibModal.open({
+		  animation: $ctrl.animationsEnabled,
+		  ariaLabelledBy: 'modal-title',
+		  ariaDescribedBy: 'modal-body',
+		  templateUrl: 'myModalContent.html',
+		  controller: 'ModalInstanceCtrl',
+		  controllerAs: '$ctrl',
+		  size: size,
+		  resolve: {
+		    items: function () {
+		      return $ctrl.items;
+		    }
+		  }
+		});
+
+		modalInstance.result.then(function (selectedItem) {
+		  $ctrl.selected = selectedItem;
+		}, function () {
+		  $log.info('Modal dismissed at: ' + new Date());
+		});
+		};
+
+		$ctrl.openComponentModal = function () {
+		var modalInstance = $uibModal.open({
+		  animation: $ctrl.animationsEnabled,
+		  component: 'modalComponent',
+		  resolve: {
+		    items: function () {
+		      return $ctrl.items;
+		    }
+		  }
+		});
+
+		modalInstance.result.then(function (selectedItem) {
+		  $ctrl.selected = selectedItem;
+		}, function () {
+		  $log.info('modal-component dismissed at: ' + new Date());
+		});
+		};
+
+		$ctrl.toggleAnimation = function () {
+		$ctrl.animationsEnabled = !$ctrl.animationsEnabled;
+		};
+    }
+
+    
+
+    angular.module('TestCtrl').controller('ModalInstanceCtrl', function ($uibModalInstance, items) {
+  var $ctrl = this;
+  $ctrl.items = items;
+  $ctrl.selected = {
+    item: $ctrl.items[0]
+  };
+
+  $ctrl.ok = function () {
+    $uibModalInstance.close($ctrl.selected.item);
+  };
+
+  $ctrl.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
+});
+
+// Please note that the close and dismiss bindings are from $uibModalInstance.
+
+angular.module('TestCtrl').component('modalComponent', {
+  templateUrl: 'myModalContent.html',
+  bindings: {
+    resolve: '<',
+    close: '&',
+    dismiss: '&'
+  },
+  controller: function () {
+    var $ctrl = this;
+
+    $ctrl.$onInit = function () {
+      $ctrl.items = $ctrl.resolve.items;
+      $ctrl.selected = {
+        item: $ctrl.items[0]
+      };
+    };
+
+    $ctrl.ok = function () {
+      $ctrl.close({$value: $ctrl.selected.item});
+    };
+
+    $ctrl.cancel = function () {
+      $ctrl.dismiss({$value: 'cancel'});
+    };
+  }
+});
+
 
 })();

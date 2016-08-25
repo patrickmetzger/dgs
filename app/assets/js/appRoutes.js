@@ -1,16 +1,86 @@
 // public/js/appRoutes.js
-angular.module('appRoutes', ['UserService'])
-    .config(['$routeProvider','$httpProvider', '$locationProvider', 'UserProvider', 
-        function($routeProvider, $httpProvider, $locationProvider, UserProvider) {
+angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
+    .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$locationProvider', 'UserProvider', 
+        function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, UserProvider) {
 
+            $urlRouterProvider.otherwise("/");
+            $stateProvider
+                .state('home', {
+                    url: "/",
+                    controller: 'MainController',
+                    restricted: false,
+                    templateUrl: "views/home.html"
+                })
+                .state('search_category', {
+                    url: "/search:category",
+                    templateUrl: "views/search/search.view.html",
+                    restricted: false,
+                    controller: "search"
+                })
+                .state('browse', {
+                    url: "/browse-items",
+                    templateUrl: "views/browse.view.html",
+                    restricted: false,
+                    controller: "browse"
+                })
+                .state('browse_category', {
+                    url: "/browse-items/:catType",
+                    templateUrl: "views/browse.items.html",
+                    restricted: false,
+                    controller: "browseItems"
+                })
+                .state('item', {
+                    url: "/item/:item/:itemID",
+                    templateUrl: "views/item.view.html",
+                    restricted: false,
+                    controller: "item",
+                    params: {
+                        item: null,
+                        itemID: null,
+                        action: null
+                    },
+                })
+                .state('login', {
+                    url: "/login",
+                    templateUrl: "views/login.html",
+                    restricted: false,
+                    params: {
+                        state: null,
+                        item: null,
+                        itemID: null,
+                        action: null,
+                    },
+                })
+                .state('register', {
+                    url: "/register",
+                    templateUrl: "views/register.html",
+                    restricted: false
+                })
+                .state('register_success', {
+                    url: "/register/registration-success",
+                    templateUrl: "views/registration/register-success.html",
+                    restricted: false
+                })
+                .state('verify_success', {
+                    url: "/verify-success",
+                    templateUrl: "views/registration/verify-success.html",
+                    restricted: false
+                })
+                .state('myaccount', {
+                    url: "/myaccount",
+                    templateUrl: "views/myaccount/index.html",
+                    restricted: true,
+                    controller: 'account'
+                })
+                .state('admin', {
+                    url: "/admin",
+                    templateUrl: "views/admin/index.html",
+                    restricted: true
+                })
+
+    /*
     $routeProvider
 
-        // home page
-        .when('/', {
-            templateUrl: 'views/home.html',
-            controller: 'MainController',
-            restricted: false
-        })
         // nerds page that will use the NerdController
         .when("/search:category", {
             controller: "search",
@@ -32,21 +102,18 @@ angular.module('appRoutes', ['UserService'])
             controller: "item",
             restricted: false
         })
-        .when('/login', {
-            templateUrl: 'views/login.html',
-            restricted: false
-        })
-        .when('/register', {
-            templateUrl: 'views/register.html',
-            restricted: false
-        })
         .when('/register/registration-success', {
             templateUrl: 'views/registration/register-success.html',
             restricted: false    
         })
         .when('/register/registration-verify/:token', {
             templateUrl: 'views/registration/register-verify.html',
-            restricted: false    
+            controller: 'registerVerify',
+            restricted: false
+        })
+        .when('/verify-success', {
+            templateUrl: 'views/registration/verify-success.html',
+            restricted: false
         })
         .when('/myaccount', {
             templateUrl: 'views/myaccount/index.html',
@@ -60,7 +127,7 @@ angular.module('appRoutes', ['UserService'])
         })
         .otherwise({
             redirectTo: '/'
-        });
+        });*/
 
         $httpProvider.interceptors.push(function($q){
             return {

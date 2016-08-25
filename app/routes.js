@@ -125,7 +125,7 @@ module.exports = function(app) {
 
     app.get('/api/user/id/:id', function(req, res, next) {
         // use mongoose to get user if one exists
-        User.findOne({ _id: req.params.id }, function(err, data) {
+        User.findById(req.params.id, function(err, data) {
             if (err) return console.error(err);
                 res.json(data)
         });

@@ -1,7 +1,7 @@
 (function() {
 	'use strict';
 
-	angular.module('dgs.sellerInfo', ['ItemService', 'Authentication', 'UserService', 'WishListService', 'ItemService']);
+	angular.module('dgs.sellerInfo', ['ItemService', 'AuthControllers', 'UserService', 'WishListService', 'ItemService']);
 
 	angular.module('dgs.sellerInfo')
 		.directive("sellerInfo", sellerInfo);
@@ -15,8 +15,7 @@
 			templateUrl: 'views/directives/sellerInfo.html',
 			link: function(scope, element, attr){
 
-				attr.$observe('id', function(value) { 
-
+				attr.$observe('id', function(value) {
 					User.getUserByID(value).then(function(response){
 		                scope.sellerInfo = response;
 		            })
@@ -43,19 +42,23 @@
 					});
 					// Are we already following this user?
 					function checkingFollow(userID){
-						User.checkIfFollow(value).then(function(data){
-							if (data){
-								$scope.action = 'delete';
-								$scope.followText = 'Currently following this user';
-							}else{
-								$scope.action = 'add';
-								if (User.getUserId()){
-									$scope.followText = 'Follow this user';
+						if (User.checkIfFollow(userID)){
+							User.checkIfFollow(userID).then(function(data){
+								if (data){
+									$scope.action = 'delete';
+									$scope.followText = 'Currently following this user';
 								}else{
-									$scope.followText = 'Sign in to follow user';
+									$scope.action = 'add';
+									if (User.getUserId()){
+										$scope.followText = 'Follow this user';
+									}else{
+										$scope.followText = 'Sign in to follow user';
+									}
 								}
-							}
-						});
+							});
+						}else{
+							$scope.followText = 'Sign in to follow user';
+						}
 					}
 
 					// if we have been redirected with an action to add item to wishlist

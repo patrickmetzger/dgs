@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="libs/angular-material/angular-material.css">
+    <link rel="stylesheet" href="libs/ngModal/dist/ng-modal.css">
     <link rel="stylesheet" href="css/style.css"> <!-- custom styles -->
 
     <!-- JS -->
@@ -18,7 +19,7 @@
     <script src="libs/bootstrap/dist/js/bootstrap.js"></script>
 
     <script src="libs/angular/angular.js"></script>
-    <script src="libs/angular-route/angular-route.js"></script>
+    <script src="libs/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="libs/angular-route/angular-route.js"></script>
     <script src="libs/angular-cookies/angular-cookies.js"></script>
     <script src="libs/angular-sanitize/angular-sanitize.js"></script>
@@ -26,13 +27,17 @@
     <script src="libs/angular-messages/angular-messages.js"></script>
     <script src="libs/angular-aria/angular-aria.js"></script>
     <script src="libs/angular-material/angular-material.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
     <!-- file upload scripts -->
     <script src="libs/ng-file-upload-shim/ng-file-upload-shim.min.js"></script> <!-- for no html5 browsers support -->
     <script src="libs/ng-file-upload/ng-file-upload.min.js"></script>
     <script src="libs/ng-img-crop/compile/minified/ng-img-crop.js"></script>
     <link rel="stylesheet" type="text/css" href="libs/ng-img-crop/compile/minified/ng-img-crop.css">
 
-
+    <!-- modal -->
+    <script src="js/ui-bootstrap-custom-2.1.2.js"></script>
+    <script src="js/ui-bootstrap-custom-tpls-2.1.2.js"></script>
+    <script src="libs/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js"></script>
 
     <!-- ANGULAR CUSTOM -->
     <script src="js/app.js"></script>
@@ -42,42 +47,16 @@
     <script src="js/constants.js"></script>
     
 </head>
-<body ng-app="dgs">
-<!-- header -->
-<div class="row-fluid">
-    <nav ng-controller="header">    
-        <div class="col-lg-5 col-md-6 col-sm-12">
-            <a class="navbar-logo" href="/"><img src="/imgs/dgs_logo.png"></a>
-        </div>
-        <div class="nav-top col-lg-7 col-md-6 col-sm-12">
-            <div class="navbar-header search">
-                <search-form></search-form>
-            </div>
-        </div>
-        <div class="col-md-12 nav-bottom">
-            <div class="col-md-offset-3">
-                <!-- LINK TO OUR PAGES. ANGULAR HANDLES THE ROUTING HERE -->
-                <ul class="nav navbar-left">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/browse-items">Browse Items</a></li>
-                    <li ng-show="!showMenu"><a href="/login">Login</a></li>
-                    <li ng-show="!showMenu"><a href="/register">Register</a></li>
-                </ul>
-                <ul>
-                    <li ng-show="showMenu"><a href="/myaccount">My Account</a></li>
-                    <li ng-show="showMenu"><a href="javascript:void(0)" ng-click="menuLogoutClick()">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</div>
+<body ng-app="dgs" ng-controller="main">
 
-<div id="main" class="col-md-12">
-    <div class="container">
-        <!-- ANGULAR DYNAMIC CONTENT -->
-        <div ng-view></div>
+    <div header></div>
+
+    <div id="main" class="col-md-12" ng-cloak>
+        <div class="container">
+            <!-- ANGULAR DYNAMIC CONTENT -->
+            <div ui-view></div>
+        </div>
     </div>
-</div>
 
 </body>
 </html>

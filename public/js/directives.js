@@ -1,7 +1,7 @@
 (function() {
 	'use strict';
 
-	angular.module('dgs.addToButtons', ['ItemService', 'Authentication', 'UserService', 'WishListService']);
+	angular.module('dgs.addToButtons', ['ItemService', 'AuthControllers', 'UserService', 'WishListService']);
 
 	angular.module('dgs.addToButtons')
 		.directive("addToButtons", addToButtons);
@@ -9,12 +9,12 @@
 	function addToButtons(item, User, wList){
 		return {
 			restrict: 'AE',
-			controller: function($scope, $element, $attrs, $location, $routeParams) {
+			controller: function($scope, $element, $attrs, $location, $state, $stateParams) {
 				$scope.action = 'add';
 				$scope.wishListText = 'Add to Wish List';
 				$scope.defaultBtnClass = 'btn-warning';
 				$scope.action = 'add';
-				var itemID = $routeParams.itemID;
+				var itemID = $stateParams.itemID;
 
 				function checkList(itemID){
 					if (wList.checkWishList(itemID)){
@@ -37,13 +37,13 @@
 							$scope.action = 'add';
 						});
 
-
+						
 					}
-					 return $scope.action;
+					return $scope.action;
 				}
 
 				// if we have been redirected with an action to add item to wishlist
-				if ($routeParams.ActionAddTolist){
+				if ($stateParams.action){
 					if (checkList(itemID) == 'add'){
 						wList.adding(itemID, 'add');
 					}
@@ -65,9 +65,9 @@
 						
 					}else{
 						if (action == 'add'){
-							User.checkAccessToken($location.path(), 'ActionAddTolist');
+							User.checkAccessToken($state.current.name, $stateParams, 'ActionAddTolist');
 						}else if (action == 'delete'){
-							User.checkAccessToken($location.path(), 'ActionrRemoveFromlist');
+							User.checkAccessToken($state.current.name, $stateParams, 'ActionRemoveFromlist');
 						}
 
 						
@@ -81,87 +81,78 @@
 	}
 
 })();
+(function () {
+    'use strict';
+
+    angular.module('dgs').directive("patternValidator", patternValidator);
+      function patternValidator() {
+        return {
+          require: 'ngModel',
+          restrict: 'A',
+          link: function(scope, elem, attrs, ctrl) {
+            ctrl.$parsers.unshift(function(viewValue) {             
+              var patt = new RegExp(attrs.patternValidator);
+              
+              var isValid = patt.test(viewValue);
+
+              ctrl.$setValidity('passwordPattern', isValid);
+
+              // angular does this with all validators -> return isValid ? viewValue : undefined;
+              // But it means that the ng-model will have a value of undefined
+              // So just return viewValue!
+              return viewValue;
+              
+            });
+          }
+        };
+    };
+
+  })();
 (function() {
 	'use strict';
 
 	angular.module('dgs').directive("header", header);
 
 	function header(){
-		return{
-			templateUrl: '/incs/header.html'
-		}
+		return {
+	        restrict: 'EA', //This menas that it will be used as an attribute and NOT as an element. I don't like creating custom HTML elements
+	        templateUrl: "views/incs/header.html",
+	        controller: "header"
+	    }
 	};
 
 })();
 (function() {
 	'use strict';
 
-	angular.module('dgs.profile', ['UserService', 'ngFileUpload', 'ngImgCrop']);
+	angular.module('dgs.loginFrm', ['AuthControllers', 'UserService']);
+
+	angular.module('dgs.loginFrm').directive("loginForm", login);
+
+	function login(User){
+		return {
+			restrict: 'AE',
+			controller: function($scope, $element, $attrs, $location, $routeParams) {
+
+			},
+	        
+			templateUrl: 'views/directives/loginForm.html',
+	  	};
+	}
+
+})();
+(function() {
+	'use strict';
+
+	angular.module('dgs.profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap']);
 
 	angular.module('dgs.profile')
 		.directive("userProfile", userProfile);
 
-	function userProfile(User){
+	function userProfile(){
 		return {
 			restrict: 'AE',
-			controller: function($scope, $element, $attrs, Upload, $timeout) {
-				$scope.profile = {};
-				User.getUserId().then(function(response){
-					var uid = response.data;
-					User.getUserByID(uid).then(function(response){
-						$scope.profile = {
-							'photo': response.data.imgFull,
-							'fullName': response.data.fullName,
-							'email': response.data.email,
-							'postal': response.data.zipCode
-						}
-					})
-				});
-
-				$scope.upload = function (dataUrl, name) {
-
-					if (name){
-						Upload.upload({
-						  	url: '/api/uploads',
-				            data: {
-				                file: Upload.dataUrltoBlob(dataUrl, name)
-				            },
-						}).then(function (response) {
-				            $timeout(function () {
-				                $scope.result = response.data;
-
-				                // lets update the users information
-				                User.updateThumb(name);
-				            });
-				        }, function (response) {
-				            if (response.status > 0) $scope.errorMsg = response.status 
-				                + ': ' + response.data;
-				        }, function (evt) {
-				            $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
-				        });	
-					}else{
-						//no name
-						console.log('failed');
-					}
-
-			        
-			    }
-
-
-
-				/*
-				var activeUserProfile = User.getProfile().then(function(response){
-					var dataResponse = response.data;
-					var profile = dataResponse;
-				});
-
-				User.getProfile().then(function(response){
-					var dataResponse = response.data;
-					$scope.profile = dataResponse;
-				});
-*/
-			},
-	        
+			controller: 'ProfileCtrl',	        
 			templateUrl: 'views/myaccount/profile.directive.html',
 	  	};
 	}
@@ -190,7 +181,7 @@
 (function() {
 	'use strict';
 
-	angular.module('dgs.sellerInfo', ['ItemService', 'Authentication', 'UserService', 'WishListService', 'ItemService']);
+	angular.module('dgs.sellerInfo', ['ItemService', 'AuthControllers', 'UserService', 'WishListService', 'ItemService']);
 
 	angular.module('dgs.sellerInfo')
 		.directive("sellerInfo", sellerInfo);
@@ -204,8 +195,7 @@
 			templateUrl: 'views/directives/sellerInfo.html',
 			link: function(scope, element, attr){
 
-				attr.$observe('id', function(value) { 
-
+				attr.$observe('id', function(value) {
 					User.getUserByID(value).then(function(response){
 		                scope.sellerInfo = response;
 		            })
@@ -232,19 +222,23 @@
 					});
 					// Are we already following this user?
 					function checkingFollow(userID){
-						User.checkIfFollow(value).then(function(data){
-							if (data){
-								$scope.action = 'delete';
-								$scope.followText = 'Currently following this user';
-							}else{
-								$scope.action = 'add';
-								if (User.getUserId()){
-									$scope.followText = 'Follow this user';
+						if (User.checkIfFollow(userID)){
+							User.checkIfFollow(userID).then(function(data){
+								if (data){
+									$scope.action = 'delete';
+									$scope.followText = 'Currently following this user';
 								}else{
-									$scope.followText = 'Sign in to follow user';
+									$scope.action = 'add';
+									if (User.getUserId()){
+										$scope.followText = 'Follow this user';
+									}else{
+										$scope.followText = 'Sign in to follow user';
+									}
 								}
-							}
-						});
+							});
+						}else{
+							$scope.followText = 'Sign in to follow user';
+						}
 					}
 
 					// if we have been redirected with an action to add item to wishlist

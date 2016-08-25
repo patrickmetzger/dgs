@@ -1,35 +1,105 @@
-<div class="photo">
-	<img class="img-thumbnail" ng-src="imgs/uploads/{{profile.photo}}"/>
+<div id="profile" ng-cloak ng-controller="ProfileCtrl">
 
-	<form name="myForm">
-        <div>Crop Image and Upload</div>
-        <button ngf-select ng-model="picFile" accept="image/*">
-            Select Picture</button>
-        <div ngf-drop ng-model="picFile" ngf-pattern="image/*"
-             class="cropArea">
-            <img-crop image="picFile  | ngfDataUrl"                 
-            result-image="croppedDataUrl" ng-init="croppedDataUrl=''">
-            </img-crop>
+    <div class="col-outer clearfix">
+        <div class="col-md-3" style="text-align: center; border-right:1px solid #eeeeee">
+            <script type="text/ng-template" id="myModalContent.html">
+                    <div class="modal-header">
+                        <h3>Upload New Profile Pic</h3>
+                    </div>  
+                    <div class="modal-body" id="modal-body">                  
+                        <form name="myForm">
+                            <button class="btn btn-primary" ngf-select ng-model="picFile" accept="image/*">Choose New Photo</button>
+                            <div ngf-drop ng-model="picFile" ngf-pattern="image/*"
+                                 class="cropArea">
+                                <img-crop image="picFile  | ngfDataUrl"                 
+                                result-image="croppedDataUrl" ng-init="croppedDataUrl=''">
+                                </img-crop>
+                            </div>
+                            <div>
+                                <img ng-src="{{croppedDataUrl}}" />
+                            </div>
+                            <button class="btn btn-success" ng-click="upload(croppedDataUrl, picFile.name)">Submit</button> 
+                                
+                            <span class="progress" ng-show="progress >= 0">
+                              <div style="width:{{progress}}%" ng-bind="progress + '%'"></div>
+                            </span>
+                            <span ng-show="result">Upload Successful</span>
+                            <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+                        </form>
+                    </div>
+                </script>
+            <!-- user avatar directive -->
+            <div>
+                <div class="thumb_outer">
+                    <div class="user_profile_pic">
+                        <img id="user_thumb" ng-src="imgs/uploads/{{profile.photo}}" width="160" height="160"/>
+                        <div class="user_profile_upload" ng-click="open()">
+                            Upload Profile Pic
+                        </div>
+                    </div>
+                </div>
+                <p class="fullName" style="text-align:center">{{ profile.fullName }}</p>
+            </div>
+
         </div>
-        <div>
-            <img ng-src="{{croppedDataUrl}}" />
+        <div class="col-md-8">
+            <h1>Edit your Personal Settings</h1>
+            <hr>
+            <form name="profileUP" ng-submit="submit(profile)">
+                <div class="form-group row" ng-class="{ 'has-error' : profile.fName.$invalid && !profile.fName.$pristine }">
+                  <label for="fName" class="col-xs-12 col-sm-3 col-md-2 col-form-label">First Name: </label>
+                  <div class="col-xs-12 col-sm-9 col-md-10">
+                    <input type="text" class="form-control" id="fName" name="fName" placeholder="first name" ng-model="profile.fName" required>
+                    <span ng-show="profile.fName.$touched && profile.fName.$invalid" class="text-danger">First name is required!</span>
+                  </div>
+                </div>
+
+                <div class="form-group row" ng-class="{ 'has-error' : profile.lName.$invalid && !profile.lName.$pristine }">
+                  <label for="lName" class="col-xs-12 col-sm-3 col-md-2 col-form-label">Last Name: </label>
+                  <div class="col-xs-12 col-sm-9 col-md-10">
+                    <input type="text" class="form-control" id="lName" name="lName" placeholder="last name" ng-model="profile.lName" required>
+                    <span ng-show="profile.lName.$touched && profile.lName.$invalid" class="text-danger">Last name is required!</span>
+                  </div>
+                </div>
+
+                <div class="form-group row" ng-class="{ 'has-error' : profile.email.$invalid && !profile.email.$pristine }">
+                  <label for="email" class="col-xs-12 col-sm-3 col-md-2 col-form-label">E-mail: </label>
+                  <div class="col-xs-12 col-sm-9 col-md-10">
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Email Address" 
+                        ng-model="profile.email" 
+                        required
+                        check-email>
+                    <span class="col-md-12 text-danger" ng-if="profile.$pending.emailExists">checking....</span>
+                    <span class="col-md-12 text-danger" ng-if="profile.$error.emailExists">Email exists already</span>
+                    <span ng-show="regForm.email.$touched && profile.email.$invalid && !profile.$error.emailExists" class="text-danger">Email Address is required!</span>
+   
+                  </div>
+                </div>
+                <hr>
+                <div class="form-group row">
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class=" { 'has-error' : profile.zipCode.$invalid && !profile.zipCode.$pristine }">
+                        <label for="zipCode" class="col-form-label">Zipcode: </label>
+                        <div>
+                            <input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="Zip Code" ng-model="profile.zipCode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/" size="10">
+                            <span ng-show="profile.zipCode.$invalid && !profile.zipCode.$pristine" class="text-danger">Valide zip code is required!</span>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class="{ 'has-error' : profile.phone.$invalid && !profile.phone.$pristine }">
+                        <label for="phone" class=" col-form-label">Phone Number: </label>
+                        <div>
+                            <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone" ng-model="profile.phone" size="10">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
         </div>
-        <button ng-click="upload(croppedDataUrl, picFile.name)">Submit</button> 
-            
-        <span class="progress" ng-show="progress >= 0">
-          <div style="width:{{progress}}%" ng-bind="progress + '%'"></div>
-        </span>
-        <span ng-show="result">Upload Successful</span>
-        <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
-    </form>
-
-
-</div>
-
-<div>
-	{{ profile.email }}
-</div>
-
-<div>
-	{{ profile.postal }}
+    </div>
 </div>

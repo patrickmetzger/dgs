@@ -25,6 +25,15 @@ nav.navbar-blue {
 		}
 	}
 }
+.search-header{
+	line-height:60px;
+
+	@media (min-width: 1200px) {
+		input.keyword {
+			width:25em;
+		}
+	}
+}
 
 .navbar-nav>li>a {
 	//padding-top: 15px;
@@ -173,6 +182,27 @@ form .progress {
     width: 0;
 }
 
+
+/*################### My Account Header ############## */
+#account_header {
+	@extend %clearfix;
+	border-bottom:1px solid grey;
+	-webkit-box-shadow: 0 8px 6px -6px grey;
+	   -moz-box-shadow: 0 8px 6px -6px grey;
+	        box-shadow: 0 8px 6px -6px grey;
+
+	margin-bottom:20px;
+
+	ul {
+		list-style: none;
+		margin-bottom:0;
+		padding:5px;
+		li {
+			display: inline-block;
+
+		}
+	}
+}
 
 /*################### PROFILE ############## */
 #profile {

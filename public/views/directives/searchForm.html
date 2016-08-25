@@ -1,6 +1,6 @@
 <form ng-controller="search" name="search" class="navbar-form navbar-left" ng-submit="searching()" role="search">
     <div class="form-group">
-      <input type="text" class="form-control" ng-model="keyword" placeholder="keyword">
+      <input type="text" class="keyword form-control" ng-model="keyword" placeholder="search...">
     </div>
     <div class="form-group">
         <select class="form-control" ng-model="category" ng-options="cat.shortName as cat.name for cat in activeCatList">

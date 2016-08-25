@@ -1,3 +1,32 @@
+// public/js/controllers/AdminCtrl.js
+angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
+
+    $scope.tagline = 'Admin Home Page';   
+
+});
+// public/js/controllers/MainCtrl.js
+angular.module('MainCtrl', []).controller('MainController', function($scope) {
+
+    $scope.tagline = 'To the moon and back!'; 
+
+});
+// public/js/controllers/NerdCtrl.js
+angular.module('NerdCtrl', ['NerdService', 'UserService'])
+	.controller('NerdController', function($scope, Nerd, User) {
+
+		$scope.allNerds = Nerd.get().then(function(response){
+			var dataResponse = response.data;
+			$scope.nerds = dataResponse;
+		});
+
+		var allUsers = User.get().then(function(response){
+			var users = response.data;
+			$scope.users = users;
+		});
+
+    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
+
+});
 (function () {
     'use strict';
 
@@ -15,12 +44,14 @@
 })();
 
 
-// public/js/controllers/AdminCtrl.js
-angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
+var authSecurity = angular.module('AuthSecurity', ['UserService']);
 
-    $scope.tagline = 'Admin Home Page';   
+var checkSecurity = function($location, User, $rootScope, $window){
+	if(!User.checkAccessToken()){
+		User.noAccess();
+	};
+};
 
-});
 angular.module('AuthControllers', ['UserService', 'UtilService']);
 
 angular.module('AuthControllers').controller('checkSecurity', security);
@@ -81,14 +112,6 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 
 
 }
-var authSecurity = angular.module('AuthSecurity', ['UserService']);
-
-var checkSecurity = function($location, User, $rootScope, $window){
-	if(!User.checkAccessToken()){
-		User.noAccess();
-	};
-};
-
 (function () {
     'use strict';
 
@@ -201,29 +224,6 @@ var checkSecurity = function($location, User, $rootScope, $window){
 })();
 
 
-// public/js/controllers/MainCtrl.js
-angular.module('MainCtrl', []).controller('MainController', function($scope) {
-
-    $scope.tagline = 'To the moon and back!'; 
-
-});
-// public/js/controllers/NerdCtrl.js
-angular.module('NerdCtrl', ['NerdService', 'UserService'])
-	.controller('NerdController', function($scope, Nerd, User) {
-
-		$scope.allNerds = Nerd.get().then(function(response){
-			var dataResponse = response.data;
-			$scope.nerds = dataResponse;
-		});
-
-		var allUsers = User.get().then(function(response){
-			var users = response.data;
-			$scope.users = users;
-		});
-
-    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
-
-});
 (function () {
     'use strict';
 

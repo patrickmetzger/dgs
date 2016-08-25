@@ -1,4 +1,4 @@
-.nav-bottom:after, nav.navbar-blue:after, ul.navbar-nav:after {
+.nav-bottom:after, nav.navbar-blue:after, ul.navbar-nav:after, #account_header:after {
   content: "";
   display: table;
   clear: both; }
@@ -15,6 +15,12 @@ nav.navbar-blue {
     @media (min-width: 768px) {
       nav.navbar-blue .search input {
         width: 300px; } }
+
+.search-header {
+  line-height: 60px; }
+  @media (min-width: 1200px) {
+    .search-header input.keyword {
+      width: 25em; } }
 
 ul.navbar-nav {
   width: 100%; }
@@ -108,6 +114,20 @@ form .progress {
   font-size: smaller;
   background: orange;
   width: 0; }
+
+/*################### My Account Header ############## */
+#account_header {
+  border-bottom: 1px solid grey;
+  -webkit-box-shadow: 0 8px 6px -6px grey;
+  -moz-box-shadow: 0 8px 6px -6px grey;
+  box-shadow: 0 8px 6px -6px grey;
+  margin-bottom: 20px; }
+  #account_header ul {
+    list-style: none;
+    margin-bottom: 0;
+    padding: 5px; }
+    #account_header ul li {
+      display: inline-block; }
 
 /*################### PROFILE ############## */
 #profile {

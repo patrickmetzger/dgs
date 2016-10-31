@@ -1,13 +1,15 @@
-<h1>Browse Items</h1>
+<div ng-controller="browse">
+	<h1>Browse Items</h1>
 
-<div ng-repeat="cats in allCats">
-	<div class="col-md-2 text-center">
-		<a href="/browse-items/{{ cats.shortName }}">
-		<div>
-			<img ng-src="{{ cats.imgThumb }}" />
+	<div id="mainbox">
+		<div ng-repeat="cats in allCats" class="cat">
+			<a ui-sref="browse_category({ catType: cats.shortName })">
+			<div>
+				<img ng-src="{{ cats.imgThumb }}" />
+			</div>
+			<div class="cat_title">{{ cats.name }}</div>
+			</a>
 		</div>
-		<div>{{ cats.name }}</div>
-		</a>
+
 	</div>
-	
 </div>

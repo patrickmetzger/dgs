@@ -7,7 +7,8 @@
         .module('dgs.authService')
         .service('AuthService', auth);
 
-        function auth($q, $cookies, $http, userRoles){
+        function auth($cacheFactory, $q, $cookies, $http, userRoles){
+          var cache = $cacheFactory('userCache');
           var username = '';
           var isAuthenticated = false;
           var role = '';
@@ -45,7 +46,7 @@
             username = '';
             isAuthenticated = false;
             $http.defaults.headers.common['X-Auth-Token'] = undefined;
-            $cookies.delete('token');
+            $cookies.remove('token');
           }
          
           var login = function(name, pw) {

@@ -1,41 +1,22 @@
-// public/js/controllers/AdminCtrl.js
-angular.module('AdminCtrl', []).controller('AdminController', function($scope) {
-
-    $scope.tagline = 'Admin Home Page';   
-
-});
-// public/js/controllers/MainCtrl.js
-angular.module('MainCtrl', []).controller('MainController', function($scope) {
-
-    $scope.tagline = 'To the moon and back!'; 
-
-});
-// public/js/controllers/NerdCtrl.js
-angular.module('NerdCtrl', ['NerdService', 'UserService'])
-	.controller('NerdController', function($scope, Nerd, User) {
-
-		$scope.allNerds = Nerd.get().then(function(response){
-			var dataResponse = response.data;
-			$scope.nerds = dataResponse;
-		});
-
-		var allUsers = User.get().then(function(response){
-			var users = response.data;
-			$scope.users = users;
-		});
-
-    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
-
-});
 (function () {
     'use strict';
 
-    angular.module('Account', ['SearchService', 'UserService', 'CatService', 'AccountService']);
+    angular.module('Account', ['SearchService', 'UserService', 'CatService', 'AccountService', 'ItemService']);
 
     angular.module('Account').controller('account', account);
-    function account($scope, $http, $location, $rootScope, User, category, accountInfo) {
-		
+    function account($scope, $http, $state, $stateParams, $location, $rootScope, User, category, accountInfo) {
+    	checkSecurity($state, User);
         $scope.title = 'My Account';
+
+    }
+
+    angular.module('Account').controller('ItemAddEdit', itemAddEdit);
+    function itemAddEdit($scope, $http, $state, $stateParams, $location, $rootScope, User, category, accountInfo, item) {
+    	checkSecurity($state, User);
+        var iID = $stateParams.itemID;
+        item.getItemByID(iID).then(function(response){
+        	$scope.itemData = response.data;
+        });
 
     }
 
@@ -44,25 +25,38 @@ angular.module('NerdCtrl', ['NerdService', 'UserService'])
 })();
 
 
-var authSecurity = angular.module('AuthSecurity', ['UserService']);
+(function () {
+    'use strict';
 
-var checkSecurity = function($location, User, $rootScope, $window){
-	if(!User.checkAccessToken()){
-		User.noAccess();
-	};
-};
+    angular.module('Admin', ['AdminServices', 'UserService', 'CatService', 'AccountService']);
+
+    angular.module('Admin').controller('AdminCtrl', adminIndex);
+    function adminIndex($scope, $http, $state, $rootScope, User, category, accountInfo) {
+        checkSecurity($state, User);
+        $scope.title = 'My Account';
+
+    }
+
+    angular.module('Admin').controller('AdminCatsCtrl', adminCats);
+    function adminCats($scope, $http, $location, $rootScope, User, category, accountInfo, adminCatsFactory) {
+    
+        $scope.title = 'Categories';
+
+    }
+    
+    angular.module('Admin').controller('AdminUsersCtrl', adminUsers);
+    function adminUsers($scope, $http, $location, $rootScope, User, category, accountInfo) {
+    
+        $scope.title = 'Users';
+
+    }
+
+})();
 
 angular.module('AuthControllers', ['UserService', 'UtilService']);
 
-angular.module('AuthControllers').controller('checkSecurity', security);
-function security($scope, $location, User){
-    if (!User.checkAccessToken()){
-        user.noAccess();    
-    }
-};
-
 angular.module('AuthControllers').controller('login', login);
-function login($scope, $rootScope, User, $location, $state, $stateParams, $cookies) {
+function login($scope, $rootScope, User, $location, $state, $stateParams, $cookies, userRoles) {
     // is there a redirect?
     var redirect = false;
     if($stateParams.action){
@@ -79,7 +73,7 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 
                 var cookieDomain = "localhost";
                 var newDate = new Date();
-                var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
+                var exp = new Date(newDate.setSeconds(60 * 60 * 5));
 
                 $cookies.put('token', response.data.token, {
                   domain: cookieDomain,
@@ -90,11 +84,20 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
                 User.createUser();
                
                 $rootScope.showMenu = true;
+                $rootScope.showAccountMenu = false;
                 $rootScope.$broadcast('loginStateChange');
                 if (redirect){
                     $state.go($stateParams.state, ({item: $stateParams.item, itemID: $stateParams.itemID, action: $stateParams.action,}));
+                }else if ($stateParams.state === 'admin'){
+                    User.getUserRole().then(function(response){
+                        if (response === 'admin'){
+                            $state.go('admin');
+                        }else{
+                            $state.go('myaccount.profile');            
+                        }
+                    });
                 }else{
-                    $state.go('myaccount');    
+                    $state.go('myaccount.profile');    
                 }
 			};
 		}, function(response){
@@ -112,10 +115,19 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 
 
 }
+var authSecurity = angular.module('AuthSecurity', ['UserService']);
+
+var checkSecurity = function($state, User, $rootScope, $window){
+	var stateName = $state.current;
+	if(!User.checkAccessToken()){
+		User.noAccess(stateName);
+	};
+};
+
 (function () {
     'use strict';
 
-    angular.module('Browse', ['SearchService', 'CatService', 'ItemService']);
+    angular.module('Browse', ['UserService', 'SearchService', 'CatService', 'ItemService', 'ngMaterial']);
 
     angular.module('Browse').controller('browse', browse);
     function browse($scope, $http, $location, $rootScope, category, catList) {
@@ -125,7 +137,17 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
     }
 
     angular.module('Browse').controller('browseItems', browseitems);
-    function browseitems($scope, $http, $location, $rootScope, category, catList, items, $stateParams) {
+    function browseitems($state, User, $scope, $http, $location, $rootScope, category, catList, items, $stateParams) {
+        $scope.sortData = {
+            availableOptions: [
+              {sort: "'-price'", value: "Price: Highest to Lowest"},
+              {sort: "'price'", value: "Price: Lowest to Highest"},
+              {sort: "'-insertDate'", value: "Date: Newsest to Oldest"},
+              {sort: "'insertDate'", value: "Date: Oldest to Newest"}
+            ],
+            selectedOption: {sort: "'-price'", value: "Price: Highest to Lowest"}
+        };
+
         category.getData($stateParams.catType).then(function(catData){
             if (catData.data && catData.data._id != ''){
                 var catID = catData.data._id;
@@ -152,8 +174,6 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
         return undefined;
     }
 
-    
-
 })();
 
 (function () {
@@ -165,15 +185,14 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
         .module('Header')
         .controller('header', header);
     function header($scope, $rootScope, $location, $stateParams, User, catList, $state) {
-		$scope.state = $state;
-        
+		$scope.$state = $state;
+
         $scope.isLoggedIn = User.checkLogin();
         $scope.menuLogoutClick = User.doLogout($scope);
         $rootScope.$on('loginStateChange', function(){
-        });
-        // get category list
-        catList.getActiveList().then(function(cats){
-            $scope.activeCatList = cats;
+            if(User.checkLogin()){
+
+            }
         });
 
 	}
@@ -209,14 +228,13 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
     angular.module('Main', ['UserService']);
 
     angular.module('Main').controller('main', main);
-    function main($scope, $http, $location, $state, $stateParams, $rootScope, User) {
+    function main($scope, $http, $state, $stateParams, $rootScope, User) {
+    	$scope.$state = $state;
 		$scope.$watch(User.checkLogin, function (value, oldValue) {
 		    if(!value && oldValue) {
-		      console.log("Disconnect");
 		      $state.go('login');
 		    }
 		}, true);
-
     }
 
     
@@ -224,26 +242,84 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 })();
 
 
+// public/js/controllers/MainCtrl.js
+angular.module('MainCtrl', []).controller('MainController', function($scope) {
+
+    $scope.tagline = 'To the moon and back!'; 
+
+});
+// public/js/controllers/NerdCtrl.js
+angular.module('NerdCtrl', ['NerdService', 'UserService'])
+	.controller('NerdController', function($scope, Nerd, User) {
+
+		$scope.allNerds = Nerd.get().then(function(response){
+			var dataResponse = response.data;
+			$scope.nerds = dataResponse;
+		});
+
+		var allUsers = User.get().then(function(response){
+			var users = response.data;
+			$scope.users = users;
+		});
+
+    $scope.tagline = 'Nothing beats a pocket protector!!!!!';
+
+});
 (function () {
     'use strict';
 
-    angular.module('Profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap']);
+    angular.module('Profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap', 'ItemService']);
 
     angular.module('Profile').controller('ProfileCtrl', profile);
-    function profile($scope, $http, $location, $rootScope, $uibModal, $log, Upload, User) {
-		checkSecurity($location, User);
+    function profile($scope, $http, $state, $rootScope, $uibModal, $log, Upload, User, ngNotify) {
+		checkSecurity($state, User);
+		$scope.requireiftrue = 'required';
 
 		$scope.onTabChanges = function(currentTabIndex){
-			checkSecurity($location, User);
+			checkSecurity($state, User);
 		};
 
         var $ctrl = this;
 
-        if (User.checkLogin()){
-        	$scope.profileData = User.buildProfile().then(function(response){
-	        	$scope.profile = response;
-	        });
+        function getData(){
+        	if (User.checkLogin()){
+	        	return User.buildProfile().then(function(response){
+		        	$scope.formData = response;
+		        });
+	        }
         }
+
+        getData();
+        
+
+        $scope.updateProfile = function(formData){
+        	$scope.isSaving = true;
+			// lets send this data to get saved
+			User.update(formData).then(function(response){
+				if (response.data === 'success'){
+					ngNotify.set('Profile Successfully Updated.', {
+						type: 'success',
+					    position: 'top',
+					    duration: 5000,
+					    sticky: false,
+						button: true
+					});
+
+					// refresh data
+					getData();
+				};
+				$scope.isSaving = false;
+			},function(){
+				ngNotify.set('Sorry, but something went wronge.', {
+					type: 'error',
+				    position: 'top',
+				    duration: 5000,
+				    sticky: false,
+					button: true
+				});
+				$scope.isSaving = false;
+			});
+		};
         
 
 		$ctrl.animationsEnabled = true;
@@ -295,9 +371,8 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 		$ctrl.toggleAnimation = function () {
 		$ctrl.animationsEnabled = !$ctrl.animationsEnabled;
 		};
-    }
 
-    
+    }
 
     angular.module('Profile').controller('ModalInstanceCtrl', function (User, $uibModalInstance, $scope, Upload, $timeout) {
 	  	var $ctrl = this;
@@ -362,6 +437,18 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 	  }
 	});
 
+	angular.module('Profile').controller('ItemsCtrl', selling);
+	function selling($scope, $http, $state, $rootScope, $log, Upload, User, ngNotify, items) {
+		checkSecurity($state, User);
+		
+		User.getUserId().then(function(id){
+			items.getItemsByUID(id).then(function(iList) {
+				$scope.itemsSelling = iList.data;
+			}, function() {
+				$scope.error = 'unable to get items';
+			});
+		});
+	}
 
 })();
 // public/js/controllers/register.js
@@ -436,13 +523,18 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
     angular.module('Search', ['SearchService', 'CatService']);
 
     angular.module('Search').controller('search', search);
-    function search($scope, $http, $location, $rootScope, $route, $routeParams, searching, category) {
+    function search($scope, $http, $location, $rootScope, $route, $routeParams, searching, category, catList) {
         $scope.category = $routeParams.category;
         $scope.keyword = $routeParams.keyword;
 
         if($location.$$search.keyword){
             $scope.keyword = $location.$$search.keyword;            
         }
+
+        // get category list
+        catList.getActiveList().then(function(cats){
+            $scope.activeCatList = cats;
+        });
 
         $scope.searching = function(){
             if ($scope.keyword != ''){
@@ -479,13 +571,25 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 (function () {
     'use strict';
 
-    angular.module('Tab', ['UserService']);
+    angular.module('MyAccount_Tab', ['UserService']);
 	
     angular
-        .module('Tab')
+        .module('MyAccount_Tab')
         .controller('tab', tab);
 
-	function tab($scope, User) {
+	function tab($scope, $state, $stateParams) {
+		$scope.profile = false;
+		$scope.items = false;
+		$scope.watchlist = false;
+
+		if ($stateParams.tab === 'profile'){
+			$scope.profile = true;		
+		}
+		else if ($stateParams.tab === 'items'){
+			$scope.items = true;		
+		}else if ($stateParams.tab === 'watchlist'){
+			$scope.watchlist = true;		
+		}
 
 	};
 

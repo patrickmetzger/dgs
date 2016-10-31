@@ -32,37 +32,37 @@
             <div>
                 <div class="thumb_outer">
                     <div class="user_profile_pic">
-                        <img id="user_thumb" ng-src="imgs/uploads/{{profile.photo}}" width="160" height="160"/>
+                        <img id="user_thumb" ng-src="imgs/uploads/{{formData.photo}}" width="160" height="160"/>
                         <div class="user_profile_upload" ng-click="open()">
                             Upload Profile Pic
                         </div>
                     </div>
                 </div>
-                <p class="fullName" style="text-align:center">{{ profile.fullName }}</p>
+                <p class="fullName" style="text-align:center">{{ formData.fullName }}</p>
             </div>
 
         </div>
         <div class="col-md-8">
             <h1>Edit your Personal Settings</h1>
             <hr>
-            <form name="profileUP" ng-submit="submit(profile)">
-                <div class="form-group row" ng-class="{ 'has-error' : profile.fName.$invalid && !profile.fName.$pristine }">
+            <form name="profileUP" ng-submit="updateProfile(formData)">
+                <div class="form-group row" ng-class="{ 'has-error' : profileUP.fName.$invalid && !profileUP.fName.$pristine }">
                   <label for="fName" class="col-xs-12 col-sm-3 col-md-2 col-form-label">First Name: </label>
                   <div class="col-xs-12 col-sm-9 col-md-10">
-                    <input type="text" class="form-control" id="fName" name="fName" placeholder="first name" ng-model="profile.fName" required>
-                    <span ng-show="profile.fName.$touched && profile.fName.$invalid" class="text-danger">First name is required!</span>
+                    <input type="text" class="form-control" id="fName" name="fName" placeholder="first name" ng-model="formData.fName" required>
+                    <span ng-show="profileUP.fName.$touched && profileUP.fName.$invalid" class="text-danger">First name is required!</span>
                   </div>
                 </div>
 
-                <div class="form-group row" ng-class="{ 'has-error' : profile.lName.$invalid && !profile.lName.$pristine }">
+                <div class="form-group row" ng-class="{ 'has-error' : profileUP.lName.$invalid && !profileUP.lName.$pristine }">
                   <label for="lName" class="col-xs-12 col-sm-3 col-md-2 col-form-label">Last Name: </label>
                   <div class="col-xs-12 col-sm-9 col-md-10">
-                    <input type="text" class="form-control" id="lName" name="lName" placeholder="last name" ng-model="profile.lName" required>
-                    <span ng-show="profile.lName.$touched && profile.lName.$invalid" class="text-danger">Last name is required!</span>
+                    <input type="text" class="form-control" id="lName" name="lName" placeholder="last name" ng-model="formData.lName" required>
+                    <span ng-show="profileUP.lName.$touched && profileUP.lName.$invalid" class="text-danger">Last name is required!</span>
                   </div>
                 </div>
 
-                <div class="form-group row" ng-class="{ 'has-error' : profile.email.$invalid && !profile.email.$pristine }">
+                <div class="form-group row" ng-class="{ 'has-error' : profileUP.email.$invalid && !profileUP.email.$pristine }">
                   <label for="email" class="col-xs-12 col-sm-3 col-md-2 col-form-label">E-mail: </label>
                   <div class="col-xs-12 col-sm-9 col-md-10">
                     <input 
@@ -70,34 +70,67 @@
                         class="form-control" 
                         id="email" 
                         name="email" 
-                        placeholder="Email Address" 
-                        ng-model="profile.email" 
-                        required
-                        check-email>
-                    <span class="col-md-12 text-danger" ng-if="profile.$pending.emailExists">checking....</span>
-                    <span class="col-md-12 text-danger" ng-if="profile.$error.emailExists">Email exists already</span>
-                    <span ng-show="regForm.email.$touched && profile.email.$invalid && !profile.$error.emailExists" class="text-danger">Email Address is required!</span>
+                        ng-model="formData.email" 
+                        required>
+                    <span class="col-md-12 text-danger" ng-if="profileUP.$pending.emailExists">checking....</span>
+                    <span class="col-md-12 text-danger" ng-if="profileUP.$error.emailExists">Email exists already</span>
+                    <span ng-show="regForm.email.$touched && profileUP.email.$invalid && !profileUP.$error.emailExists" class="text-danger">Email Address is required!</span>
    
                   </div>
                 </div>
                 <hr>
                 <div class="form-group row">
-                    <div class="col-xs-12 col-sm-6 form-group" ng-class=" { 'has-error' : profile.zipCode.$invalid && !profile.zipCode.$pristine }">
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class=" { 'has-error' : profileUP.zipCode.$invalid && !profileUP.zipCode.$pristine }">
                         <label for="zipCode" class="col-form-label">Zipcode: </label>
                         <div>
-                            <input type="text" class="form-control" id="zipCode" name="zipCode" placeholder="Zip Code" ng-model="profile.zipCode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/" size="10">
-                            <span ng-show="profile.zipCode.$invalid && !profile.zipCode.$pristine" class="text-danger">Valide zip code is required!</span>
+                            <input type="text" class="form-control" id="zipCode" name="zipCode" ng-model="formData.zipCode" required="true" ng-pattern="/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/" size="10">
+                            <span ng-show="profileUP.zipCode.$invalid && !profileUP.zipCode.$pristine" class="text-danger">Valide zip code is required!</span>
                         </div>
 
                     </div>
 
-                    <div class="col-xs-12 col-sm-6 form-group" ng-class="{ 'has-error' : profile.phone.$invalid && !profile.phone.$pristine }">
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class="{ 'has-error' : profileUP.phone.$invalid && !profileUP.phone.$pristine }">
                         <label for="phone" class=" col-form-label">Phone Number: </label>
                         <div>
-                            <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone" ng-model="profile.phone" size="10">
+                            <input type="text" class="form-control" id="phone" name="phone" ng-model="formData.phone" ui-mask="(999) 999-9999" size="10">
                         </div>
                     </div>
                 </div>
+
+                <hr>
+                <div class="form-group row">
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class=" { 'has-error' : formData.password != '' && profileUP.password.$invalid && !profileUP.password.$pristine }">
+                        <label for="password" class="col-form-label">Password: </label>
+                        <div>
+                            <input type="password" name="password" id="password" ng-model="formData.password" ng-model-options="{allowInvalid: true}" pattern-validator="((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,8})" class="form-control">
+                            <span ng-show="formData.password != '' && profileUP.password.$error.passwordPattern" class="text-danger">The password does not meet requirements!</span>
+                            <div>
+                                <p>Min length 8, a special character, a digit, and at least one capital letter</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-6 form-group" ng-class="{ 'has-error' : formData.password != '' && profileUP.password_confirm.$invalid }">
+                        <label for="password_confirm" class=" col-form-label">Confirm Password: </label>
+                        <div>
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" ng-model="formData.password_confirm" size="10" ng-model-options="{allowInvalid: true}" pattern-validator="((?=.*\d)(?=.*[A-Z])(?=.*\W).{8,8})" password-verify="formData.password" ng-required='formData.password'>
+                        </div>
+                        <span ng-show="formData.password != '' && profileUP.password_confirm.$error.passwordPattern" class="text-danger">The password does not meet requirements!</span>
+                        <div ng-show="formData.password != '' && profileUP.password_confirm.$error.passwordVerify" class="text-danger">
+                            Passwords do not match. Please try again!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-sm-6 form-group">
+                    <button 
+                        type="submit" 
+                        ng-disabled="profileUP.$invalid || isSaving" 
+                        class="btn btn-primary">
+                        Update Profile
+                    </button>
+                </div> 
             </form>
 
         </div>

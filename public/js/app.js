@@ -4,18 +4,23 @@ angular.module('dgs', [
 	'ui.router',
 	'ngRoute', 
 	'appRoutes', 
+	'ui.mask',
 	'ngCookies',
 	'ngSanitize',
+	'ngNotify',
 	'AuthSecurity',
 	'ValidationDirectives',
+	'PasswordVerify',
 	'MainCtrl', 
 	'UserService', 
-	'AdminCtrl',
+	'Admin',
+	'AdminServices',
 	'Register',
 	'ngMaterial',
 	'Seller',
 	'CatService',
 	'SearchService',
+	'MyAccount_Tab',
 	'Account',
 	'AccountService',
 	'Header',
@@ -42,17 +47,29 @@ angular.module('dgs', [
 	]);
 
 angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $state, User, countItem, Util, AuthService, authEvents, userRoles) {
+
+	$rootScope.location = $location;
+
 	//$http.defaults.headers.common = 'application/json';
 	if ($cookies.get('token')) {
 		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
 	}
 	$rootScope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+		$rootScope.isAdmin = false;
 		if (User.getToken()){
 			User.getUserId().then(function(response){
-				User.getUserByID(response.data).then(function(response){
-					var role = response.data.role;
+				User.getUserByID(response).then(function(response){
+					User.getUserRole().then(function(role){
+						if (role === 'admin'){
+							$rootScope.isAdmin = true;
+						}
+					});
 					$rootScope.$broadcast(userRoles.role);
 				})
+			}, function(response){
+				// lets redirect to the login
+				AuthService.logout();
+				$state.go('login', {refresh: true});
 			});
 		}
 
@@ -70,14 +87,23 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $sta
     	}
 
     	if (toState.restricted && !User.checkLogin()){
-    		$state.go('login', {refresh: true});
+			$state.go('login', {refresh: true});
     	}else{
     		if (User.checkLogin()){
     			$rootScope.showMenu = true;
+    			$rootScope.showAccountMenu = true;
     		}
     	}
 
-    	console.log($rootScope);
+    	document.addEventListener("keyup", function(e) {
+	        if (e.keyCode === 27)
+	            $rootScope.$broadcast("escapePressed", e.target);
+	    });
+
+	    document.addEventListener("click", function(e) {
+	        $rootScope.$broadcast("documentClicked", e.target);
+	    });
+
 	});
 });
 // public/js/appRoutes.js
@@ -85,35 +111,99 @@ angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$locationProvider', 'UserProvider', 
         function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider, UserProvider) {
 
-            $urlRouterProvider.otherwise("/");
             $stateProvider
                 .state('home', {
                     url: "/",
-                    controller: 'MainController',
-                    restricted: false,
-                    templateUrl: "views/home.html"
+                    controller: 'MainController',                  
+                    views: {
+                        'master': {
+                            templateUrl: "views/_main.html"
+                        },
+                        'home@home': {
+                            templateUrl: "views/home.html"
+                        }
+                    }
                 })
                 .state('search_category', {
                     url: "/search:category",
-                    templateUrl: "views/search/search.view.html",
                     restricted: false,
-                    controller: "search"
+                    nav: "search",
+                    controller: "search",
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html",
+                        },
+                        "topbar@search_category": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@search_category": {
+                            templateUrl: "views/search/search.view.html",
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
                 })
                 .state('browse', {
                     url: "/browse-items",
-                    templateUrl: "views/browse.view.html",
+                    nav: "browse",
                     restricted: false,
-                    controller: "browse"
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html"
+                        },
+                        "topbar@browse": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@browse": {
+                            templateUrl: "views/browse.view.html",
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
+                    //controller: "browse"
                 })
                 .state('browse_category', {
                     url: "/browse-items/:catType",
-                    templateUrl: "views/browse.items.html",
-                    restricted: false,
-                    controller: "browseItems"
+                    nav: "browse",
+
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html"
+                        },
+                        "topbar@browse_category": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@browse_category": {
+                            templateUrl: "views/browse.items.html",
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
+                    params: {
+                        catType: null
+                    },
+                    restricted: false
                 })
                 .state('item', {
                     url: "/item/:item/:itemID",
-                    templateUrl: "views/item.view.html",
+                    nav: "browse",
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html",
+                        },
+                        "topbar@item": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@item": {
+                            templateUrl: "views/item.view.html",
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
                     restricted: false,
                     controller: "item",
                     params: {
@@ -124,8 +214,22 @@ angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
                 })
                 .state('login', {
                     url: "/login",
-                    templateUrl: "views/login.html",
+                    nav: "login",
                     restricted: false,
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html",
+                        },
+                        "topbar@login": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@login": {
+                            templateUrl: "views/login.html"
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
                     params: {
                         state: null,
                         item: null,
@@ -135,7 +239,21 @@ angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
                 })
                 .state('register', {
                     url: "/register",
-                    templateUrl: "views/register.html",
+                    nav: "register",
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html",
+                        },
+                        "topbar@register": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@register": {
+                            templateUrl: "views/register.html"
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
                     restricted: false
                 })
                 .state('register_success', {
@@ -150,66 +268,90 @@ angular.module('appRoutes', ['UserService', 'ngFileUpload', 'ngImgCrop'])
                 })
                 .state('myaccount', {
                     url: "/myaccount",
-                    templateUrl: "views/myaccount/index.html",
+                    views: {
+                        "master": {
+                            templateUrl: "views/_main.html",
+                        },
+                        "topbar@myaccount": {
+                            templateUrl: "/views/_topbar.html",
+                        },
+                        "content@myaccount": {
+                            templateUrl: "views/myaccount/index.html"
+                        },
+                        "footer":{
+                            templateUrl: "views/incs/footer.html",
+                        }
+                    },
                     restricted: true,
-                    controller: 'account'
+                    abstract: true,
+
+                })
+                .state('myaccount.home', {
+                    url: "/home",
+                    templateUrl: "views/myaccount/myaccount_index.html",
+                    restricted: true,
+                    controller: 'account',
+                    params: {
+                        tab: null
+                    },
+                })
+                .state('myaccount.profile', {
+                    url: "/profile",
+                    templateUrl: "views/myaccount/myaccount_index.html",
+                    restricted: true,
+                    controller: 'account',
+                    params: {
+                        tab: 'profile'
+                    },
+                })
+                .state('myaccount.items', {
+                    url: "/my-items",
+                    templateUrl: "views/myaccount/myaccount_index.html",
+                    restricted: true,
+                    controller: 'account',
+                    params: {
+                        tab: 'items'
+                    },
+                })
+                .state('myaccount.watchlist', {
+                    url: "/my-watchlist",
+                    templateUrl: "views/myaccount/myaccount_index.html",
+                    restricted: true,
+                    controller: 'account',
+                    params: {
+                        tab: 'watchlist'
+                    },
+                })
+                .state('myaccount.item_add_edit', {
+                    url: "/item_add_edit",
+                    templateUrl: "views/myaccount/item_add_update.html",
+                    restricted: true,
+                    controller: 'ItemAddEdit',
+                    params: {
+                        itemID: null
+                    },
                 })
                 .state('admin', {
                     url: "/admin",
                     templateUrl: "views/admin/index.html",
+                    controller: 'AdminCtrl',
+                    nav: 'admin',
                     restricted: true
                 })
-
-    /*
-    $routeProvider
-
-        // nerds page that will use the NerdController
-        .when("/search:category", {
-            controller: "search",
-            templateUrl: "views/search/search.view.html",
-            restricted: false
-        })
-        .when('/browse-items', {
-            templateUrl: 'views/browse.view.html',
-            controller: "browse",
-            restricted: false
-        })
-        .when('/browse-items/:catType', {
-            templateUrl: 'views/browse.items.html',
-            controller: "browseItems",
-            restricted: false
-        })
-        .when('/item/:item/:itemID', {
-            templateUrl: 'views/item.view.html',
-            controller: "item",
-            restricted: false
-        })
-        .when('/register/registration-success', {
-            templateUrl: 'views/registration/register-success.html',
-            restricted: false    
-        })
-        .when('/register/registration-verify/:token', {
-            templateUrl: 'views/registration/register-verify.html',
-            controller: 'registerVerify',
-            restricted: false
-        })
-        .when('/verify-success', {
-            templateUrl: 'views/registration/verify-success.html',
-            restricted: false
-        })
-        .when('/myaccount', {
-            templateUrl: 'views/myaccount/index.html',
-            controller: 'account',
-            restricted: true
-        })
-        .when('/admin', {
-            templateUrl: 'views/admin/index.html',
-            controller: 'AdminController',
-            restricted: true
-        })
-        .otherwise({
-            redirectTo: '/'
-        });*/
+                .state('admin_cats', {
+                    url: "/admin/categories",
+                    templateUrl: "views/admin/cats.html",
+                    controller: 'AdminCatsCtrl',
+                    nav: 'admin',
+                    restricted: true
+                })
+                .state('admin_users', {
+                    url: "/admin/users",
+                    templateUrl: "views/admin/users.html",
+                    controller: 'AdminUsersCtrl',
+                    nav: 'admin',
+                    restricted: true
+                })
 
         $httpProvider.interceptors.push(function($q){
             return {

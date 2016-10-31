@@ -1,0 +1,19 @@
+<div ng-controller="tab" ng-cloak>
+  <flash-message duration="5000"></flash-message> 
+
+  <!-- profile -->
+  <div ng-if="profile">
+    <user-profile></user-profile>
+  </div>
+
+  <!-- items -->
+  <div ng-if="items">
+    <items-selling></items-selling>
+  </div>
+
+  <!-- watchlist -->
+  <div ng-if="watchlist">
+    <!--<watch-list></watch-list>-->
+  </div>
+
+</div>

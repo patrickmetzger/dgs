@@ -4,18 +4,23 @@ angular.module('dgs', [
 	'ui.router',
 	'ngRoute', 
 	'appRoutes', 
+	'ui.mask',
 	'ngCookies',
 	'ngSanitize',
+	'ngNotify',
 	'AuthSecurity',
 	'ValidationDirectives',
+	'PasswordVerify',
 	'MainCtrl', 
 	'UserService', 
-	'AdminCtrl',
+	'Admin',
+	'AdminServices',
 	'Register',
 	'ngMaterial',
 	'Seller',
 	'CatService',
 	'SearchService',
+	'MyAccount_Tab',
 	'Account',
 	'AccountService',
 	'Header',
@@ -42,17 +47,29 @@ angular.module('dgs', [
 	]);
 
 angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $state, User, countItem, Util, AuthService, authEvents, userRoles) {
+
+	$rootScope.location = $location;
+
 	//$http.defaults.headers.common = 'application/json';
 	if ($cookies.get('token')) {
 		$http.defaults.headers.Authorization = 'Bearer ' + $cookies.get('token');
 	}
 	$rootScope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+		$rootScope.isAdmin = false;
 		if (User.getToken()){
 			User.getUserId().then(function(response){
-				User.getUserByID(response.data).then(function(response){
-					var role = response.data.role;
+				User.getUserByID(response).then(function(response){
+					User.getUserRole().then(function(role){
+						if (role === 'admin'){
+							$rootScope.isAdmin = true;
+						}
+					});
 					$rootScope.$broadcast(userRoles.role);
 				})
+			}, function(response){
+				// lets redirect to the login
+				AuthService.logout();
+				$state.go('login', {refresh: true});
 			});
 		}
 
@@ -70,13 +87,22 @@ angular.module('dgs').run(function ($http, $rootScope, $cookies, $location, $sta
     	}
 
     	if (toState.restricted && !User.checkLogin()){
-    		$state.go('login', {refresh: true});
+			$state.go('login', {refresh: true});
     	}else{
     		if (User.checkLogin()){
     			$rootScope.showMenu = true;
+    			$rootScope.showAccountMenu = true;
     		}
     	}
 
-    	console.log($rootScope);
+    	document.addEventListener("keyup", function(e) {
+	        if (e.keyCode === 27)
+	            $rootScope.$broadcast("escapePressed", e.target);
+	    });
+
+	    document.addEventListener("click", function(e) {
+	        $rootScope.$broadcast("documentClicked", e.target);
+	    });
+
 	});
 });

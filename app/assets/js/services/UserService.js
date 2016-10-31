@@ -2,12 +2,15 @@
 angular.module('UserService', ['ngCookies','EmailService']);
 
 angular.module('UserService').factory('User', user);
-function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Email) {
-    
+function user($cacheFactory, $rootScope, $http, $cookies, $location, $state, $q, userRoles, Email) {  
     var loginState = false;
 
     var userById = function(id){
-        return $http.get('/api/user/id/' + id);
+        var userData = '';
+        if (id){
+            userData = $http.get('/api/user/' + id);
+        }
+        return userData;
     };
 
     var checkFollow = function(id){
@@ -51,7 +54,7 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
         }else{
             return UserObject;
         }
-   }
+    }
 
     var getUID = function(){
         if (checkBearerToken()){
@@ -66,14 +69,15 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
 
     }
 
-    var logout = function(){
+    var logout = function(params){
 
         $cookies.remove("token");
 
         $rootScope.showMenu = false;
+        $rootScope.showAccountMenu = false;
         $rootScope.$broadcast('loginStateChange');
 
-        $state.go('login'); // go to login
+        $state.go('login', ({state: params.name})); // go to login
     };
 
     var followUser = function(itemID, action){
@@ -96,15 +100,12 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
         // get user id to build user
         var userID = $http.get('/api/userid');
 
-        var userData = userID.then(function(response){
+        userID.then(function(response){
             userById(response.data).then(function(userData){
+                var role = response.data.role;
                 return userData.data;
             });
         });
-
-
-        return userData;
-
     };
 
     updateImgThumb = function(name){
@@ -145,8 +146,22 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
             return userWatchList(uID);
         },
 
+        getUserRole: function(){
+            return $http.get('/api/userid').then(function(response){
+                return userById(response.data).then(function(userData){
+                    return userData.data.role;
+                });
+            });
+        },
+
         getUserId : function(){
-            return getUID();
+            if (checkBearerToken()){
+                return $http.get('/api/userid').then(function(response){
+                    return response.data;
+                });
+            }else{
+                return undefined;
+            }
         },
 
         getToken: function(){
@@ -169,6 +184,10 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
         // these will work when more API routes are defined on the Node side of things
         // call to POST and create a new nerd
         create : function(usersData) {
+            return saveUser(usersData);
+        },
+
+        update : function(usersData) {
             return saveUser(usersData);
         },
 
@@ -200,8 +219,8 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
             };
         },
 
-        noAccess: function(){
-            return logout();
+        noAccess: function(params){
+            return logout(params);
         },
 
         buildProfile: function(){
@@ -222,7 +241,8 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
                         'lName': response.data.lName,
                         'fullName': response.data.fullName,
                         'email': response.data.email,
-                        'zipCode': response.data.zipCode
+                        'zipCode': response.data.zipCode,
+                        'phone': response.data.phone
                     }
                     return profile;
                 })

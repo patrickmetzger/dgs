@@ -1,0 +1,17 @@
+<md-button ng-click="openLeftMenu()" ng-if="isAdmin" class="md-raised">
+    Admin Menu
+</md-button>
+
+<md-sidenav class="md-sidenav-left" md-is-locked-open="$mdMedia('gt-md')" md-component-id="left" md-whiteframe="4" id="admin_menu">
+  	<nav id="c-menu--slide-left" class="c-menu c-menu--slide-left">
+		<button class="c-menu__close" ng-click="toggleLeft()">&larr; Close Menu</button>
+		<ul class="c-menu__items">
+			<li class="c-menu__item"><a ui-sref="admin" class="c-menu__link">Admin Home</a></li>
+			<li class="c-menu__item"><a ui-sref="admin_cats" class="c-menu__link">Categories</a></li>
+			<li class="c-menu__item"><a ui-sref="admin_users" class="c-menu__link">Users</a></li>
+			<li class="c-menu__item"><a href="javascript:void(0)" class="c-menu__link" ng-click="menuLogoutClick()">Logout</a></li>
+		</ul>
+	</nav><!-- /c-menu slide-left -->
+</md-sidenav>
+
+

@@ -1,0 +1,18 @@
+<div>Add / Edit</div>
+{{ itemData }}
+<div>
+	<form name="itemFrm" ng-submit="submit()">
+		<div>
+			<input type="text" name="name" ng-model="itemData.name" />
+		</div>
+		<div>
+			<textarea ng-model="itemData.description" name="description"></textarea>
+		</div>
+		<div>
+			<input type="text" name="price" ng-model="itemData.price">
+		</div>
+		<div>
+			<input type="text" name="location" ng-model="itemData.location">
+		</div>
+	</form>
+</div>

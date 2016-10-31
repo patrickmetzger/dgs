@@ -1,0 +1,131 @@
+.cat {
+  img{
+    border-radius: 50%;
+    margin: 10px;
+  }
+
+  width: 200px;
+  padding: 10px;
+  margin: 10px 40px;
+  position:relative;
+  text-align: center;
+
+  .cat_title {
+    font-size:22px;
+    text-decoration: none;
+  }
+}
+
+.card{
+  width: 250px;
+  padding-top:10px;
+  border: 1px #a0a0a0 solid;
+  box-shadow: 1px 1px 3px #888;
+  background: #ffffff;//#A4D5D9;
+  min-height: 250px;
+  margin: 10px 21px 10px 5px;
+  position:relative;
+  //@include border-radius(5px);
+
+  .cardContentBase {
+    overflow: hidden;
+    border-top: 1px solid grey;
+    position: relative;
+    padding:10px;
+    opacity: 0.8;
+    background:#A4D5D9;
+
+    .addToWishList{
+      text-align:right;
+      font-size:18px;
+      a {
+        color:$darkGrey;
+      }
+    }
+     
+  }
+
+  .cardContent {
+    //padding:10px;
+    .cardImage {
+      width:100%;
+      text-align: center;
+      img{
+        border-radius: 50%;
+        width: 150px;
+        margin: 10px;
+      }
+    }
+    
+    .cardContentBottom {
+      position:relative;
+      padding:10px;
+      opacity: 0.4;
+      //background:#A4D5D9;
+    }
+
+
+    .cardItemName {
+      width: 100%;
+      font-size:26px;
+      color: $blue;
+      text-align: center;
+    }
+  }
+  
+
+  .priceContainer {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    min-height: 47px;
+
+    .pricing {
+      position: absolute;
+      float: right;
+      width: 73px;
+      height: 47px;
+      line-height: 37px;
+      right: -8px;
+      color: white;
+      font-family: "proxima-nova", sans-serif;
+      font-size: 15px;
+      background: url(../imgs/gi_common_v2Images.png) no-repeat -170px 0;
+    }
+
+    .priceValue {
+      float: right;
+      margin-right: 10px;
+    }
+
+  }
+  
+
+  h1{
+    font-weight: lighter;
+    margin-left: 100px;
+    margin-top: -70px;
+  }
+
+  p{
+    margin: 10px;
+    font-family: segoe ui;
+    line-height: 1.4em;
+    font-size: 1.2em;
+  }
+}
+
+
+
+#mainbox{
+  font-family: calibri;
+  box-sizing: border-box;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  clear:both;
+  a {
+    text-decoration: none;
+  }
+
+}

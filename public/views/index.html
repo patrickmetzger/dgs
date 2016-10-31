@@ -7,23 +7,29 @@
 
     <title>DisneyGarageSale.com</title>
 
+    <link href="https://fonts.googleapis.com/css?family=Lato|Raleway" rel="stylesheet">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="libs/angular-material/angular-material.css">
     <link rel="stylesheet" href="libs/ngModal/dist/ng-modal.css">
+    <link rel="stylesheet" href="libs/ng-notify/dist/ng-notify.min.css">
     <link rel="stylesheet" href="css/style.css"> <!-- custom styles -->
 
     <!-- JS -->
     <script src="libs/jquery/dist/jquery.min.js"></script>
     <script src="libs/bootstrap/dist/js/bootstrap.js"></script>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/enquire.js/2.1.2/enquire.min.js"></script>
     <script src="libs/angular/angular.js"></script>
     <script src="libs/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="libs/angular-route/angular-route.js"></script>
     <script src="libs/angular-cookies/angular-cookies.js"></script>
     <script src="libs/angular-sanitize/angular-sanitize.js"></script>
+    <script src="libs/angular-ui-mask/dist/mask.min.js"></script>
     <script src="libs/angular-animate/angular-animate.js"></script>
+    <script src="libs/ng-notify/dist/ng-notify.min.js"></script>
     <script src="libs/angular-messages/angular-messages.js"></script>
     <script src="libs/angular-aria/angular-aria.js"></script>
     <script src="libs/angular-material/angular-material.js"></script>
@@ -48,15 +54,31 @@
     
 </head>
 <body ng-app="dgs" ng-controller="main">
+    <div id="masterUI" ui-view="master">
+        <!-- everything happens in here :) -->
+    </div>
+    <div id="footer" ui-view="footer"></div>
+    <!--
+    <div ui-view="topbar"></div>
+    <div ui-view="master"></div>
+    <div id="main" class="container-fluid">
+        <div class="container ui-view-container">
+            <div ui-view="sidebar"></div>
+            <div ui-view="content"></div> 
+        </div>
+    </div>
+    
+    
 
-    <div header></div>
+    
+    <!--
+    <div header ng-cloak></div>
 
     <div id="main" class="col-md-12" ng-cloak>
         <div class="container">
-            <!-- ANGULAR DYNAMIC CONTENT -->
             <div ui-view></div>
         </div>
     </div>
-
+    -->
 </body>
 </html>

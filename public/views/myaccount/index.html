@@ -1,29 +1,4 @@
 <div>My Account</div>
-<div ng-cloak>
-  <md-content>
-    <md-tabs md-dynamic-height md-border-bottom>
-      <md-tab label="Profile" md-on-select="onTabChanges(0)">
-        <md-content class="md-padding">
-          <user-profile></user-profile>
-        </md-content>
-      </md-tab>
 
-      <md-tab label="Items I'm Selling" md-on-select="onTabChanges(1)">
-        <md-content class="md-padding">
-          <h1 class="md-display-2">Items I'm Selling</h1>
-          <button>Sell an Item</button>
-        </md-content>
-      </md-tab>
-      
-      <md-tab label="Watchlist" md-on-select="onTabChanges(2)">
-        <md-content class="md-padding">
-
-          <h1 class="md-display-2">Watchlist</h1>
-          <!--<watch-list></watch-list>-->
-          
-        </md-content>
-      </md-tab>
-
-    </md-tabs>
-  </md-content>
-</div>
+<my-account-header></my-account-header>
+<div id="myaccount" ui-view></div>

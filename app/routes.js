@@ -85,30 +85,6 @@ module.exports = function(app) {
       })(req, res, next);
     });
 
-    /*
-    app.post('/api/authenticate', function(req, res, cb) {
-        // find the user
-        User.findOne({email: req.body.email}, function(err, user) {
-            if (err) throw err;
-
-            if (!user) {
-              res.json({ success: false, message: 'Authentication failed. User not found.' });
-            } else if (user) {
-                // test a matching password
-                user.comparePassword(req.body.password, function(err, isMatch) {
-                    if (err) throw err;
-                    res.json({
-                      success: true,
-                      _id: user._id,
-                      message: 'Authenciation Successful',
-                      date: Date.now()
-                    });
-                });                    
-            }
-
-        });
-    });*/
-
     // STARTING USER
     app.get('/api/user', function(req, res) {
         // use mongoose to get all nerds in the database
@@ -123,7 +99,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/api/user/id/:id', function(req, res, next) {
+    app.get('/api/user/:id', function(req, res, next) {
         // use mongoose to get user if one exists
         User.findById(req.params.id, function(err, data) {
             if (err) return console.error(err);
@@ -140,33 +116,45 @@ module.exports = function(app) {
     });
 
     app.post('/api/user', function(req, res) {
-        if (req.body._id){ // were updating
-            User.findByIdAndUpdate(req.body._id, req.body, function(err, user) {
-              if (err) throw err;
+        
+        User.findOne({ email: req.body.email }, function(err, user) {
+            if (!user){
+                var regPost;
+                regPost = new User({
+                    fName : req.body.fName,
+                    lName : req.body.lName,
+                    fullName : req.body.fullName,
+                    email : req.body.email,
+                    zipCode : req.body.zipcode,
+                    url : req.body.url,
+                    imgThumb : req.body.imgThumb,
+                    imgFull : req.body.imgFull,
+                    password : req.body.password
+                });
+               
+                regPost.save(function(err, regPost){
+                    if(err){ return next(err); }
 
-              // we have the updated user returned to us
-              console.log(user);
-            });
-        }else{
-            var regPost;
-            regPost = new User({
-                fName : req.body.fName,
-                lName : req.body.lName,
-                fullName : req.body.fullName,
-                email : req.body.email,
-                zipCode : req.body.zipcode,
-                url : req.body.url,
-                imgThumb : req.body.imgThumb,
-                imgFull : req.body.imgFull,
-                password : req.body.password
-            });
-           
-            regPost.save(function(err, regPost){
-                if(err){ return next(err); }
-
-                res.json(regPost);
-            });
-        }
+                    res.json(regPost);
+                });
+            }else{
+                if (req.body.password && req.body.password.length != 0){
+                    user.password = req.body.password;
+                    user.save(function(err) {
+                      res.json('success');
+                    });
+                }else{
+                    var uid = user._id;
+                    req.body.password = user.password;
+                    req.body.fullName = req.body.fName + ' ' + req.body.lName;
+                    User.findByIdAndUpdate(uid, req.body, function(err, user) {
+                      if (err) throw err;
+                      res.json('success');
+                    });
+                }
+                
+            }
+        });
     });
 
     // update USER wishlist
@@ -304,6 +292,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/items/user/:id', function(req, res, next) {
+        console.log(req.params.id);
         // use mongoose to get item if one exists
         Item.find({ "sellerID": req.params.id }, function(err, data) {
             if (err) return console.error(err);

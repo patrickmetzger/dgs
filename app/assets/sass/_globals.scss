@@ -1,0 +1,83 @@
+html, body {
+	width:100%;
+	height: 100%;
+	font-family: 'Lato', sans-serif;
+	font-size:15px;
+	background: #100040;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Raleway', sans-serif;
+}
+
+h1 {
+	font-size:35px;
+}
+
+h2 {
+	font-size:30px;
+}
+
+h3 {
+	font-size:25px;
+}
+
+h4, h5, h6 {
+	font-size:20px;
+}
+
+button {
+	margin-top: 4px;
+}
+
+/* ANIMATIONS
+============================================================================= */
+
+/* leaving animations ----------------------------------------- */
+/* rotate and fall */
+@keyframes rotateFall {
+    0%      { transform: rotateZ(0deg); }
+    20%     { transform: rotateZ(10deg); animation-timing-function: ease-out; }
+    40%     { transform: rotateZ(17deg); }
+    60%     { transform: rotateZ(16deg); }
+    100%    { transform: translateY(100%) rotateZ(17deg); }
+}
+
+/* slide in from the bottom */
+@keyframes slideOutLeft {
+    to      { transform: translateX(-100%); }
+}
+
+/* rotate out newspaper */
+@keyframes rotateOutNewspaper {
+    to      { transform: translateZ(-3000px) rotateZ(360deg); opacity: 0; }
+}
+
+/* entering animations --------------------------------------- */
+/* scale up */
+@keyframes scaleUp {
+    from    { opacity: 0.3; -webkit-transform: scale(0.8); }
+}
+
+/* slide in from the right */
+@keyframes slideInRight {
+    from    { transform:translateX(100%); }
+    to      { transform: translateX(0); }
+}
+
+/* slide in from the bottom */
+@keyframes slideInUp {
+    from    { transform:translateY(100%); }
+    to      { transform: translateY(0); }
+}
+
+
+@include keyframes(fade-in) {
+  0% { opacity: 0; }
+  70% { opacity: 1; }
+}
+
+.row {
+	margin-left: 0px;
+    margin-right: 0px;
+}

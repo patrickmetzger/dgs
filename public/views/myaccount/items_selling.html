@@ -1,0 +1,17 @@
+<a ui-sref="myaccount.item_add_edit" class="btn btn-default">Sell an Item</a>
+<div class="items_selling">
+	<div class="item" ng-repeat="i in itemsSelling">
+		<div class="col-md-3">
+			<img ng-src="{{i.imgThumb}}" />
+		</div>
+		<div class="col-md-6">
+			<div class="name">{{ i.name }}</div>
+			<div>{{ i.price | currency}}</div>
+			<div ng-bind-html="i.description" />
+		</div>
+		<div class="col-md-3" style="line-height:75px;">
+			<a ui-sref="myaccount.item_add_edit({'itemID': i._id})"><i style="color:darkblue; font-size:22px;" class="fa fa-cog" aria-hidden="true"></i></a>
+			<a ui-sref="myaccount.item_delete"><i style="color:red; font-size:22px;" class="fa fa-trash-o" aria-hidden="true"></i></a>
+		</div>
+	</div>
+</div>

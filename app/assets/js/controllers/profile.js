@@ -1,23 +1,58 @@
 (function () {
     'use strict';
 
-    angular.module('Profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap']);
+    angular.module('Profile', ['UserService', 'ngFileUpload', 'ngImgCrop', 'ui.bootstrap', 'ItemService']);
 
     angular.module('Profile').controller('ProfileCtrl', profile);
-    function profile($scope, $http, $location, $rootScope, $uibModal, $log, Upload, User) {
-		checkSecurity($location, User);
+    function profile($scope, $http, $state, $rootScope, $uibModal, $log, Upload, User, ngNotify) {
+		checkSecurity($state, User);
+		$scope.requireiftrue = 'required';
 
 		$scope.onTabChanges = function(currentTabIndex){
-			checkSecurity($location, User);
+			checkSecurity($state, User);
 		};
 
         var $ctrl = this;
 
-        if (User.checkLogin()){
-        	$scope.profileData = User.buildProfile().then(function(response){
-	        	$scope.profile = response;
-	        });
+        function getData(){
+        	if (User.checkLogin()){
+	        	return User.buildProfile().then(function(response){
+		        	$scope.formData = response;
+		        });
+	        }
         }
+
+        getData();
+        
+
+        $scope.updateProfile = function(formData){
+        	$scope.isSaving = true;
+			// lets send this data to get saved
+			User.update(formData).then(function(response){
+				if (response.data === 'success'){
+					ngNotify.set('Profile Successfully Updated.', {
+						type: 'success',
+					    position: 'top',
+					    duration: 5000,
+					    sticky: false,
+						button: true
+					});
+
+					// refresh data
+					getData();
+				};
+				$scope.isSaving = false;
+			},function(){
+				ngNotify.set('Sorry, but something went wronge.', {
+					type: 'error',
+				    position: 'top',
+				    duration: 5000,
+				    sticky: false,
+					button: true
+				});
+				$scope.isSaving = false;
+			});
+		};
         
 
 		$ctrl.animationsEnabled = true;
@@ -69,9 +104,8 @@
 		$ctrl.toggleAnimation = function () {
 		$ctrl.animationsEnabled = !$ctrl.animationsEnabled;
 		};
-    }
 
-    
+    }
 
     angular.module('Profile').controller('ModalInstanceCtrl', function (User, $uibModalInstance, $scope, Upload, $timeout) {
 	  	var $ctrl = this;
@@ -136,5 +170,17 @@
 	  }
 	});
 
+	angular.module('Profile').controller('ItemsCtrl', selling);
+	function selling($scope, $http, $state, $rootScope, $log, Upload, User, ngNotify, items) {
+		checkSecurity($state, User);
+		
+		User.getUserId().then(function(id){
+			items.getItemsByUID(id).then(function(iList) {
+				$scope.itemsSelling = iList.data;
+			}, function() {
+				$scope.error = 'unable to get items';
+			});
+		});
+	}
 
 })();

@@ -9,7 +9,11 @@
 	function addToButtons(item, User, wList){
 		return {
 			restrict: 'AE',
+			scope: {
+				button: "="
+			},
 			controller: function($scope, $element, $attrs, $location, $state, $stateParams) {
+				console.log($scope.button);
 				$scope.action = 'add';
 				$scope.wishListText = 'Add to Wish List';
 				$scope.defaultBtnClass = 'btn-warning';

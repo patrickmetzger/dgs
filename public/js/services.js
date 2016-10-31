@@ -1,277 +1,3 @@
-// public/js/services/NerdService.js
-angular.module('NerdService', []).factory('Nerd', ['$http', function($http) {
-
-    return {
-        // call to get all nerds
-        get : function() {
-            return $http.get('/api/nerds');
-        },
-
-
-                // these will work when more API routes are defined on the Node side of things
-        // call to POST and create a new nerd
-        create : function(nerdData) {
-            return $http.post('/api/nerds', nerdData);
-        },
-
-        // call to DELETE a nerd
-        delete : function(id) {
-            return $http.delete('/api/nerds/' + id);
-        }
-    }       
-
-}]);
-// public/js/services/UserService.js
-angular.module('UserService', ['ngCookies','EmailService']);
-
-angular.module('UserService').factory('User', user);
-function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Email) {
-    
-    var loginState = false;
-
-    var userById = function(id){
-        return $http.get('/api/user/id/' + id);
-    };
-
-    var checkFollow = function(id){
-        var userData = returnUserID(id);
-        if (userData){
-            return $http.get('/api/user/follow/' + userData.token + '/' + id).then(function(response){
-                var followingData = response.data;
-                return followingData;
-            });
-        }else{
-            return undefined;   
-        }
-        return checkFollow;
-    };
-
-    var getBearToken = function(){
-        var beartoken = $cookies.get("token");
-        return beartoken;
-    };
-
-    var checkBearerToken = function(state, ref, action){
-        var activeSession = $cookies.get("token");
-        if (activeSession){
-            loginState = true;
-        }else{
-            // lets redirect to the login page with a redirect back to page.
-            if (action){
-                $state.go("login", { "state": state, "item": ref.item, "itemID": ref.itemID, "action": action});
-            }else if (ref){
-                $state.go("login", { "state": state, "item": ref.item, "itemID": ref.itemID});
-            }else{
-                $state.go("login");
-            }
-        }
-        return loginState;
-    };
-
-    var activeUserProfile = function(){
-        if (UserObject.email){
-            return buildUser();
-        }else{
-            return UserObject;
-        }
-   }
-
-    var getUID = function(){
-        if (checkBearerToken()){
-            return $http.get('/api/userid');
-        }else{
-            return undefined;
-        }
-        
-    }
-
-    var returnUserID = function(id){
-
-    }
-
-    var logout = function(){
-
-        $cookies.remove("token");
-
-        $rootScope.showMenu = false;
-        $rootScope.$broadcast('loginStateChange');
-
-        $state.go('login'); // go to login
-    };
-
-    var followUser = function(itemID, action){
-        var userData = returnUserID();
-        if (userData){
-            // add to users wishlist
-            var data = {
-                'userID' : userData.token,
-                'itemID' : itemID,
-                'action' : action
-            };
-
-            $http.post('/api/user/follow', data).then(function(success){
-                return success;
-            });
-        }
-    };
-
-    var buildUser = function(){
-        // get user id to build user
-        var userID = $http.get('/api/userid');
-
-        var userData = userID.then(function(response){
-            userById(response.data).then(function(userData){
-                return userData.data;
-            });
-        });
-
-
-        return userData;
-
-    };
-
-    updateImgThumb = function(name){
-        // get uid and update users data
-        return getUID().then(function (response) {
-            var usersData = {
-                '_id': response.data,
-                'imgThumb': name
-            }
-            
-            $http.post('/api/user', usersData);
-        });           
-    };
-
-    saveUser = function(data){
-        return $http.post('/api/user', data);
-    };
-
-    sendEmail = function(type, data){
-        // pass welcome email to route
-        Email.welcome(data);
-    }
-
-
-    return {
-        updateThumb : function(name){
-            return updateImgThumb(name);
-        },
-        createUser : function(){
-            return buildUser();
-        },
-
-        getUserByID : function(id){
-            return userById(id);
-        },
-
-        getWatchList : function(uID){
-            return userWatchList(uID);
-        },
-
-        getUserId : function(){
-            return getUID();
-        },
-
-        getToken: function(){
-            return getBearToken();
-        },
-
-        checkAccessToken: function(state, ref, action){
-            return checkBearerToken(state, ref, action);
-        },
-
-        // call to get all users
-        get : function() {
-            return $http.get('/api/user');
-        },
-
-        checkEmail : function(email) {
-            return $http.get('/api/users/' + email);
-        },
-
-        // these will work when more API routes are defined on the Node side of things
-        // call to POST and create a new nerd
-        create : function(usersData) {
-            return saveUser(usersData);
-        },
-
-        sendWelcomeMail : function(data){
-            return sendEmail('welcome', data);
-        },
-
-        // call to DELETE a nerd
-        delete : function(id) {
-            return $http.delete('/api/user/' + id);
-        },
-
-        authenticate : function(loginData){
-            return $http.post('/api/authenticate', loginData);
-        },
-
-        checkLogin: function() {
-            if ($cookies.get("token")){
-                loginState = true;
-            }else{
-                loginState = false;
-            };
-            return loginState;
-        },
-
-        doLogout: function($scope){
-            return function() {
-                logout($scope);
-            };
-        },
-
-        noAccess: function(){
-            return logout();
-        },
-
-        buildProfile: function(){
-            var buildingProfile = getUID().then(function(response){
-                var uid = response.data;
-                var thumb = '';
-                var buidByID = userById(uid).then(function(response){
-                    if (response.data.imgThumb){
-                        // set to default image
-                        thumb = response.data.imgThumb;
-                    }else{
-                        thumb = 'default_user.svg';
-                    }
-                    
-                    var profile = {
-                        'photo': thumb,
-                        'fName': response.data.fName,
-                        'lName': response.data.lName,
-                        'fullName': response.data.fullName,
-                        'email': response.data.email,
-                        'zipCode': response.data.zipCode
-                    }
-                    return profile;
-                })
-
-                return buidByID;
-                
-            });
-
-            return buildingProfile;
-        },
-
-        getProfile: function(){
-            return activeUserProfile();
-        },
-
-        checkIfFollow: function(userID){
-            return checkFollow(userID);
-        },
-
-        follow: function(id, action){
-            return followUser(id, action);
-        }
-        
-    }       
-
-};
 // public/js/services/account.js
 (function () {
     'use strict';
@@ -283,8 +9,6 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
         .factory('accountInfo', accountInfo);
 
 	function accountInfo($http, $location, User) {
-		//checkSecurity($location, user);
-
 		return {
 			userProfile: function(){
 				
@@ -295,6 +19,38 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
 	}
 
 })();
+'use strict';
+angular.module('AdminServices', [])
+
+.factory('adminCatsFactory', ['$http', 
+  function($http) {
+
+    return {
+      getPages: function() {
+        return $http.get('/api/pages');
+      },
+
+      savePage: function(pageData) {
+        var id = pageData._id;
+
+        if (id === 0) {
+          return $http.post('/api/pages/add', pageData);
+        } else {
+          return $http.post('/api/pages/update', pageData);
+        }
+      },
+      deletePage: function(id) {
+        return $http.get('/api/pages/delete/' + id);
+      },
+      getAdminPageContent: function(id) {
+        return $http.get('/api/pages/admin-details/' + id);
+      },
+      getPageContent: function(url) {
+        return $http.get('/api/pages/details/' + url);
+      },
+    };
+  }
+]);
 (function () {
     'use strict';
 
@@ -304,7 +60,8 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
         .module('dgs.authService')
         .service('AuthService', auth);
 
-        function auth($q, $cookies, $http, userRoles){
+        function auth($cacheFactory, $q, $cookies, $http, userRoles){
+          var cache = $cacheFactory('userCache');
           var username = '';
           var isAuthenticated = false;
           var role = '';
@@ -342,7 +99,7 @@ function user($rootScope, $http, $cookies, $location, $state, $q, userRoles, Ema
             username = '';
             isAuthenticated = false;
             $http.defaults.headers.common['X-Auth-Token'] = undefined;
-            $cookies.delete('token');
+            $cookies.remove('token');
           }
          
           var login = function(name, pw) {
@@ -468,7 +225,7 @@ angular.module('EmailService')
             var data = {
                 'to': 'pjmetzger76@gmail.com',//usrData.email,
                 'subject' : 'DisneyGarageSale.com Activation Required!',
-                'html' : "<div style='width:100%; text-align:center'><div style='width:50%'><div style='margin-bottom:30px;'>LOGO</div><div style='font-size:15px; border:1px solid #cccccc; padding:20px; margin-bottom:30px;'><p>Thank you for joining Disneygaragesale.com. Please confirm your email by clicking on the button below. If you received this by mistake or weren't expecting it, please disregard this email</p></div><div style='background:green; padding:30px;'><a style='font-size:20px; font-weight:bold; color: #ffffff;' href='http://localhost:8080/register/registration-verify/" + usrData.salt + "'>ACTIVATE ACCOUNT</a></div></div>",
+                'html' : "<div style='width:100%; text-align:center'><div style='width:50%'><div style='margin-bottom:30px;'>LOGO</div><div style='font-size:15px; border:1px solid #cccccc; padding:20px; margin-bottom:30px;'><p>Thank you for joining Disneygaragesale.com. Please confirm your email by clicking on the button below. If you received this by mistake or weren't expecting it, please disregard this email</p></div><div style='background:green; padding:30px;'><a style='font-size:20px; font-weight:bold; color: #ffffff;' href='http://localhost:8080/verify/" + usrData.salt + "'>ACTIVATE ACCOUNT</a></div></div>",
                 'text' : 'This is the text, if needed'
             }
             return $http.post('/sendemail', data);
@@ -495,8 +252,8 @@ angular.module('EmailService')
 
 	function items($http) {
 
-		var itemsByID = function(id){
-			return $http.get('/api/items/user/' + id);
+		var itemsByUID = function(uid){
+			return $http.get('/api/items/user/' + uid);
 		};
 
 		var itemsByCat = function(catID){
@@ -517,8 +274,8 @@ angular.module('EmailService')
 	            return itemsByCat(catID);
 	        },
 
-	        getItemsByID : function(id) {
-	            return itemsByID(id);
+	        getItemsByUID : function(uid) {
+	            return itemsByUID(uid);
 	        },
 
 	        getItemCountByID : function(id) {
@@ -564,6 +321,29 @@ angular.module('EmailService')
 	}
 
 })();
+// public/js/services/NerdService.js
+angular.module('NerdService', []).factory('Nerd', ['$http', function($http) {
+
+    return {
+        // call to get all nerds
+        get : function() {
+            return $http.get('/api/nerds');
+        },
+
+
+                // these will work when more API routes are defined on the Node side of things
+        // call to POST and create a new nerd
+        create : function(nerdData) {
+            return $http.post('/api/nerds', nerdData);
+        },
+
+        // call to DELETE a nerd
+        delete : function(id) {
+            return $http.delete('/api/nerds/' + id);
+        }
+    }       
+
+}]);
 (function () {
     'use strict';
 
@@ -792,6 +572,277 @@ angular.module('dgs').factory('AuthServiceOLD',
 	}
 
 
+// public/js/services/UserService.js
+angular.module('UserService', ['ngCookies','EmailService']);
+
+angular.module('UserService').factory('User', user);
+function user($cacheFactory, $rootScope, $http, $cookies, $location, $state, $q, userRoles, Email) {  
+    var loginState = false;
+
+    var userById = function(id){
+        var userData = '';
+        if (id){
+            userData = $http.get('/api/user/' + id);
+        }
+        return userData;
+    };
+
+    var checkFollow = function(id){
+        var userData = returnUserID(id);
+        if (userData){
+            return $http.get('/api/user/follow/' + userData.token + '/' + id).then(function(response){
+                var followingData = response.data;
+                return followingData;
+            });
+        }else{
+            return undefined;   
+        }
+        return checkFollow;
+    };
+
+    var getBearToken = function(){
+        var beartoken = $cookies.get("token");
+        return beartoken;
+    };
+
+    var checkBearerToken = function(state, ref, action){
+        var activeSession = $cookies.get("token");
+        if (activeSession){
+            loginState = true;
+        }else{
+            // lets redirect to the login page with a redirect back to page.
+            if (action){
+                $state.go("login", { "state": state, "item": ref.item, "itemID": ref.itemID, "action": action});
+            }else if (ref){
+                $state.go("login", { "state": state, "item": ref.item, "itemID": ref.itemID});
+            }else{
+                $state.go("login");
+            }
+        }
+        return loginState;
+    };
+
+    var activeUserProfile = function(){
+        if (UserObject.email){
+            return buildUser();
+        }else{
+            return UserObject;
+        }
+    }
+
+    var getUID = function(){
+        if (checkBearerToken()){
+            return $http.get('/api/userid');
+        }else{
+            return undefined;
+        }
+        
+    }
+
+    var returnUserID = function(id){
+
+    }
+
+    var logout = function(params){
+
+        $cookies.remove("token");
+
+        $rootScope.showMenu = false;
+        $rootScope.showAccountMenu = false;
+        $rootScope.$broadcast('loginStateChange');
+
+        $state.go('login', ({state: params.name})); // go to login
+    };
+
+    var followUser = function(itemID, action){
+        var userData = returnUserID();
+        if (userData){
+            // add to users wishlist
+            var data = {
+                'userID' : userData.token,
+                'itemID' : itemID,
+                'action' : action
+            };
+
+            $http.post('/api/user/follow', data).then(function(success){
+                return success;
+            });
+        }
+    };
+
+    var buildUser = function(){
+        // get user id to build user
+        var userID = $http.get('/api/userid');
+
+        userID.then(function(response){
+            userById(response.data).then(function(userData){
+                var role = response.data.role;
+                return userData.data;
+            });
+        });
+    };
+
+    updateImgThumb = function(name){
+        // get uid and update users data
+        return getUID().then(function (response) {
+            var usersData = {
+                '_id': response.data,
+                'imgThumb': name
+            }
+            
+            $http.post('/api/user', usersData);
+        });           
+    };
+
+    saveUser = function(data){
+        return $http.post('/api/user', data);
+    };
+
+    sendEmail = function(type, data){
+        // pass welcome email to route
+        Email.welcome(data);
+    }
+
+
+    return {
+        updateThumb : function(name){
+            return updateImgThumb(name);
+        },
+        createUser : function(){
+            return buildUser();
+        },
+
+        getUserByID : function(id){
+            return userById(id);
+        },
+
+        getWatchList : function(uID){
+            return userWatchList(uID);
+        },
+
+        getUserRole: function(){
+            return $http.get('/api/userid').then(function(response){
+                return userById(response.data).then(function(userData){
+                    return userData.data.role;
+                });
+            });
+        },
+
+        getUserId : function(){
+            if (checkBearerToken()){
+                return $http.get('/api/userid').then(function(response){
+                    return response.data;
+                });
+            }else{
+                return undefined;
+            }
+        },
+
+        getToken: function(){
+            return getBearToken();
+        },
+
+        checkAccessToken: function(state, ref, action){
+            return checkBearerToken(state, ref, action);
+        },
+
+        // call to get all users
+        get : function() {
+            return $http.get('/api/user');
+        },
+
+        checkEmail : function(email) {
+            return $http.get('/api/users/' + email);
+        },
+
+        // these will work when more API routes are defined on the Node side of things
+        // call to POST and create a new nerd
+        create : function(usersData) {
+            return saveUser(usersData);
+        },
+
+        update : function(usersData) {
+            return saveUser(usersData);
+        },
+
+        sendWelcomeMail : function(data){
+            return sendEmail('welcome', data);
+        },
+
+        // call to DELETE a nerd
+        delete : function(id) {
+            return $http.delete('/api/user/' + id);
+        },
+
+        authenticate : function(loginData){
+            return $http.post('/api/authenticate', loginData);
+        },
+
+        checkLogin: function() {
+            if ($cookies.get("token")){
+                loginState = true;
+            }else{
+                loginState = false;
+            };
+            return loginState;
+        },
+
+        doLogout: function($scope){
+            return function() {
+                logout($scope);
+            };
+        },
+
+        noAccess: function(params){
+            return logout(params);
+        },
+
+        buildProfile: function(){
+            var buildingProfile = getUID().then(function(response){
+                var uid = response.data;
+                var thumb = '';
+                var buidByID = userById(uid).then(function(response){
+                    if (response.data.imgThumb){
+                        // set to default image
+                        thumb = response.data.imgThumb;
+                    }else{
+                        thumb = 'default_user.svg';
+                    }
+                    
+                    var profile = {
+                        'photo': thumb,
+                        'fName': response.data.fName,
+                        'lName': response.data.lName,
+                        'fullName': response.data.fullName,
+                        'email': response.data.email,
+                        'zipCode': response.data.zipCode,
+                        'phone': response.data.phone
+                    }
+                    return profile;
+                })
+
+                return buidByID;
+                
+            });
+
+            return buildingProfile;
+        },
+
+        getProfile: function(){
+            return activeUserProfile();
+        },
+
+        checkIfFollow: function(userID){
+            return checkFollow(userID);
+        },
+
+        follow: function(id, action){
+            return followUser(id, action);
+        }
+        
+    }       
+
+};
 (function () {
     'use strict';
 

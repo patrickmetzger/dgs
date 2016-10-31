@@ -40,6 +40,7 @@ var UserSchema = new Schema({
     lName : {type : String, default: '', required: false},
     fullName : {type : String, default: '', required: false},
     username : {type: String, default: '', require: false},
+    phone : {type: String, default: '', require: false},
     zipCode : {type : Number},
     url : {type : String, default: ''},
     imgThumb : {type : String, default: ''},

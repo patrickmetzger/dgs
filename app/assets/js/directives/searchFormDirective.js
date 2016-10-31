@@ -9,8 +9,8 @@
 	function searchFrm(){
 		return {
 			restrict: 'AE',
-			require: '?ngModel',
-			controller: 'search',	        
+			require: '?ngModel',	        
+			controller: 'search',
 			templateUrl: 'views/directives/searchForm.html',
 			link: function(scope, element, attrs, ngModel){
 			}

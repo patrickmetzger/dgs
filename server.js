@@ -75,6 +75,7 @@ app.get("/verify/:token", function (req, res, next) {
     var token = req.params.token;
 
     User.findOne({salt: token}, function (err, doc){
+    	console.log(doc);
         if (err) return done(err);
 
         var id = doc._id;

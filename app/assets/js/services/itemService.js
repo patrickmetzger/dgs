@@ -10,8 +10,8 @@
 
 	function items($http) {
 
-		var itemsByID = function(id){
-			return $http.get('/api/items/user/' + id);
+		var itemsByUID = function(uid){
+			return $http.get('/api/items/user/' + uid);
 		};
 
 		var itemsByCat = function(catID){
@@ -32,8 +32,8 @@
 	            return itemsByCat(catID);
 	        },
 
-	        getItemsByID : function(id) {
-	            return itemsByID(id);
+	        getItemsByUID : function(uid) {
+	            return itemsByUID(uid);
 	        },
 
 	        getItemCountByID : function(id) {

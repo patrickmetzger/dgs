@@ -1,7 +1,8 @@
 var authSecurity = angular.module('AuthSecurity', ['UserService']);
 
-var checkSecurity = function($location, User, $rootScope, $window){
+var checkSecurity = function($state, User, $rootScope, $window){
+	var stateName = $state.current;
 	if(!User.checkAccessToken()){
-		User.noAccess();
+		User.noAccess(stateName);
 	};
 };

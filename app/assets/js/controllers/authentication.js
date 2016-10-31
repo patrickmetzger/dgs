@@ -1,14 +1,7 @@
 angular.module('AuthControllers', ['UserService', 'UtilService']);
 
-angular.module('AuthControllers').controller('checkSecurity', security);
-function security($scope, $location, User){
-    if (!User.checkAccessToken()){
-        user.noAccess();    
-    }
-};
-
 angular.module('AuthControllers').controller('login', login);
-function login($scope, $rootScope, User, $location, $state, $stateParams, $cookies) {
+function login($scope, $rootScope, User, $location, $state, $stateParams, $cookies, userRoles) {
     // is there a redirect?
     var redirect = false;
     if($stateParams.action){
@@ -25,7 +18,7 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
 
                 var cookieDomain = "localhost";
                 var newDate = new Date();
-                var exp = new Date(newDate.setSeconds(newDate.getSeconds() + 30000));
+                var exp = new Date(newDate.setSeconds(60 * 60 * 5));
 
                 $cookies.put('token', response.data.token, {
                   domain: cookieDomain,
@@ -36,11 +29,20 @@ function login($scope, $rootScope, User, $location, $state, $stateParams, $cooki
                 User.createUser();
                
                 $rootScope.showMenu = true;
+                $rootScope.showAccountMenu = false;
                 $rootScope.$broadcast('loginStateChange');
                 if (redirect){
                     $state.go($stateParams.state, ({item: $stateParams.item, itemID: $stateParams.itemID, action: $stateParams.action,}));
+                }else if ($stateParams.state === 'admin'){
+                    User.getUserRole().then(function(response){
+                        if (response === 'admin'){
+                            $state.go('admin');
+                        }else{
+                            $state.go('myaccount.profile');            
+                        }
+                    });
                 }else{
-                    $state.go('myaccount');    
+                    $state.go('myaccount.profile');    
                 }
 			};
 		}, function(response){
